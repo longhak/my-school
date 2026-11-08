@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="km">
 <head>
-    <script src="firebase-config.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ប្រព័ន្ធគ្រប់គ្រងសាលារៀន និងវត្តមានសិស្ស</title>
-
+    
     <!-- Font Awesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Firebase Libraries -->
-    <script src="https://www.gstatic.com/firebasejs/"></script>
-    <script src="https://www.gstatic.com/firebasejs/"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <!-- html2pdf Library សម្រាប់ Export ជា PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -341,13 +340,12 @@
             #btn-nav-data-entry, #tab-data-entry { display: none !important; }
         }
 
-        /* ប្រព័ន្ធវាយតម្លៃឥរិយាបថ/សមត្ថភាព — Embedded iframe */
-        #tab-conduct-eval.active { display: flex; flex-direction: column; height: calc(100vh - 40px); }
-        #tab-conduct-eval .section-header { flex-shrink: 0; }
-        #conduct-eval-frame { flex: 1; }
-        @media (max-width: 900px) {
-            #tab-conduct-eval.active { height: auto; }
-        }
+        /* ប្រព័ន្ធវាយតម្លៃឥរិយាបថ/សមត្ថភាព — ឥឡូវបញ្ចូលផ្ទាល់ក្នុងទំព័រនេះ (Merged)
+           មិនប្រើ iframe ទៀតទេ — សូមមើល CSS ដាច់ដោយឡែក scoped ក្រោម .conduct-eval-app
+           នៅចុងបញ្ចប់ file នេះ។
+           ចំណាំ៖ មុននេះមាន negative-margin trick (margin:-2rem;width:calc(100% + 4rem))
+           ដើម្បីធ្វើឲ្យ topbar ជាប់គែម ប៉ុន្តែវាបណ្តាលឲ្យទំព័រហៀរធំជាងទំហំអេក្រង់ទូរស័ព្ទ
+           ធ្វើឲ្យ browser បង្រួម (zoom-to-fit) ទំព័រទាំងមូល — ដូច្នេះលុបចោល ប្រើ padding ធម្មតា */
 
         #loading-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -435,7 +433,221 @@
             th, td { padding: 3px 1px !important; }
             th { background-color: #e2e8f0 !important; color: black !important; -webkit-print-color-adjust: exact; }
         }
-    </style>
+    
+
+        /* ================================================================
+           ប្រព័ន្ធវាយតម្លៃឥរិយាបថ/សមត្ថភាព — CSS (Merged, scoped ក្រោម .conduct-eval-app)
+           ពណ៌/theme ខាងក្នុងទាញយកតម្លៃពី CSS variables របស់ប្រព័ន្ធមេ (--primary, --bg ។ល។)
+           ដើម្បីឲ្យមានរូបរាងតែមួយ ស្របតាមស្តង់ដារទាំងមូល
+           ================================================================ */
+        .conduct-eval-app {
+            --ce-primary: var(--primary);
+            --ce-primary-dark: var(--primary-hover);
+            --ce-primary-light: #eef2ff;
+            --ce-accent: var(--telegram);
+            --ce-accent-light: #e0f2fe;
+            --ce-ok: var(--success);
+            --ce-ok-light: #ecfdf5;
+            --ce-bg: var(--bg);
+            --ce-surface: var(--card-bg);
+            --ce-text: var(--text);
+            --ce-muted: var(--text-muted);
+            --ce-border: var(--border);
+            --ce-danger: #dc2626;
+            --ce-radius: var(--radius);
+        }
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;500;600;700;800&display=swap');
+.conduct-eval-app {
+  font-family:'Noto Sans Khmer','Khmer OS Siemreap','Khmer OS',sans-serif;
+  background:var(--ce-bg);
+  color:var(--ce-text);
+  line-height:1.6;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden; /* ការពារកុំឲ្យខ្លឹមសារខាងក្នុងហៀរធំជាងទំព័រ ធ្វើឲ្យ browser បង្រួមទំព័រទាំងមូល */
+  max-width: 100%;
+}
+.conduct-eval-app h1, .conduct-eval-app h2, .conduct-eval-app h3, .conduct-eval-app h4 {margin:0;font-weight:700;}
+.conduct-eval-app button {font-family:inherit;cursor:pointer;}
+.conduct-eval-app input, .conduct-eval-app select {font-family:inherit;}
+.conduct-eval-app .topbar {
+  background:linear-gradient(135deg,var(--ce-primary),var(--ce-primary-dark));
+  color:#fff;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  box-shadow:0 2px 10px rgba(18,51,92,0.25);
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+.conduct-eval-app .topbar .brand {display:flex;align-items:center;gap:10px;}
+.conduct-eval-app .topbar .brand .logo {
+  width:38px;height:38px;border-radius:10px;
+  background:rgba(255,255,255,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.conduct-eval-app .topbar h1 {font-size:16px;letter-spacing:.2px;line-height:1.3;}
+.conduct-eval-app .topbar .sub {font-size:11.5px;opacity:.85;margin-top:2px;}
+.conduct-eval-app .topbar .actions {display:flex;gap:6px;width:100%;overflow-x:auto;padding-bottom:2px;}
+.conduct-eval-app .btn {
+  border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:.15s;white-space:nowrap;
+  touch-action: manipulation;
+}
+.conduct-eval-app .btn-ghost {background:rgba(255,255,255,0.15);color:#fff;}
+.conduct-eval-app .btn-ghost:active {background:rgba(255,255,255,0.3);}
+.conduct-eval-app .btn-white {background:#fff;color:var(--ce-primary-dark);}
+.conduct-eval-app .btn-white:active {background:#eef3fa;}
+.conduct-eval-app .btn-primary {background:var(--ce-primary);color:#fff;}
+.conduct-eval-app .btn-primary:active {background:var(--ce-primary-dark);}
+.conduct-eval-app .btn-outline {background:#fff;border:1.5px solid var(--ce-border);color:var(--ce-text);}
+.conduct-eval-app .btn-danger {background:#fdecea;color:var(--ce-danger);}
+.conduct-eval-app .btn-sm {padding:6px 10px;font-size:12px;border-radius:7px;}
+.conduct-eval-app .wrap {max-width:1180px;margin:0 auto;padding:12px 12px 0;}
+.conduct-eval-app .panel {
+  background:var(--ce-surface);
+  border:1px solid var(--ce-border);
+  border-radius:var(--ce-radius);
+  padding:14px;
+  margin-bottom:12px;
+}
+.conduct-eval-app .metabar {display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
+.conduct-eval-app .field {display:flex;flex-direction:column;gap:4px;flex:1;min-width:110px;}
+.conduct-eval-app .field label {font-size:11.5px;color:var(--ce-muted);font-weight:600;}
+.conduct-eval-app .field input, .conduct-eval-app .field select {
+  border:1.5px solid var(--ce-border);border-radius:8px;padding:8px;font-size:13.5px;
+  background:#fbfcfe;color:var(--ce-text);width:100%;
+}
+.conduct-eval-app .field input:focus, .conduct-eval-app .field select:focus {outline:none;border-color:var(--ce-primary);background:#fff;}
+.conduct-eval-app .field.grow {flex:1 1 100%;}
+.conduct-eval-app .student-select-wrap {display:flex;gap:8px;align-items:flex-end;width:100%;margin-top:4px;}
+.conduct-eval-app .student-select-wrap select {flex:1;font-size:14.5px;font-weight:700;color:var(--ce-primary-dark);padding:9px;}
+.conduct-eval-app .summary {display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+@media (max-width: 480px) {
+.conduct-eval-app .summary { grid-template-columns:1fr; }
+
+}
+.conduct-eval-app .chip {
+  background:var(--ce-surface);border:1px solid var(--ce-border);border-radius:var(--ce-radius);
+  padding:12px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;
+}
+.conduct-eval-app .chip.blue {border-top:4px solid var(--ce-primary);}
+.conduct-eval-app .chip.amber {border-top:4px solid var(--ce-accent);}
+.conduct-eval-app .chip .chip-label {font-size:11.5px;color:var(--ce-muted);font-weight:600;}
+.conduct-eval-app .chip .chip-value {font-size:22px;font-weight:800;color:var(--ce-text);}
+.conduct-eval-app .chip .chip-value small {font-size:12.5px;font-weight:600;color:var(--ce-muted);}
+.conduct-eval-app .chip .bar {height:6px;background:#eef1f5;border-radius:5px;overflow:hidden;margin-top:2px;}
+.conduct-eval-app .chip .bar > div {height:100%;border-radius:5px;transition:width .25s;}
+.conduct-eval-app .chip.blue .bar > div {background:var(--ce-primary);}
+.conduct-eval-app .chip.amber .bar > div {background:var(--ce-accent);}
+.conduct-eval-app .chip .chip-foot {display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--ce-muted);margin-top:4px;}
+.conduct-eval-app .grade-tag {font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;}
+.conduct-eval-app .grade-good {background:var(--ce-ok-light);color:var(--ce-ok);}
+.conduct-eval-app .grade-fair {background:#eaf1fb;color:var(--ce-primary);}
+.conduct-eval-app .grade-avg {background:#fff6e0;color:#9a7300;}
+.conduct-eval-app .grade-weak {background:#fdecea;color:var(--ce-danger);}
+.conduct-eval-app .tabs {display:flex;gap:4px;margin-bottom:12px;border-bottom:2px solid var(--ce-border);overflow-x:auto;}
+.conduct-eval-app .tab {
+  padding:10px 12px;font-weight:700;font-size:13.5px;color:var(--ce-muted);
+  border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;
+}
+.conduct-eval-app .tab.active {color:var(--ce-primary);border-bottom-color:var(--ce-primary);}
+.conduct-eval-app .tab-panel {display:none;}
+.conduct-eval-app .tab-panel.active {display:block;}
+.conduct-eval-app .cat-grid {display:grid;grid-template-columns:1fr;gap:12px;}
+@media (min-width: 768px) {
+.conduct-eval-app .cat-grid { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+.conduct-eval-app .topbar .actions {width:auto;}
+.conduct-eval-app .field.grow {flex:1;}
+.conduct-eval-app .student-select-wrap {width:auto;}
+
+}
+.conduct-eval-app .cat-card {background:var(--ce-surface);border:1px solid var(--ce-border);border-radius:var(--ce-radius);overflow:hidden;}
+.conduct-eval-app .cat-head {background:var(--ce-primary-light);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;}
+.conduct-eval-app .cat-head h3 {font-size:14px;color:var(--ce-primary-dark);}
+.conduct-eval-app .cat-head .cat-score {font-size:12px;font-weight:700;color:var(--ce-primary-dark);background:#fff;padding:2px 8px;border-radius:99px;}
+.conduct-eval-app .cat-items {padding:4px 8px;}
+.conduct-eval-app .item-row {
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 6px;border-bottom:1px solid #f0f2f5;font-size:13px;
+}
+.conduct-eval-app .item-row:last-child {border-bottom:none;}
+.conduct-eval-app .item-row .item-text {flex:1;line-height:1.4;}
+.conduct-eval-app .switch {position:relative;width:46px;height:26px;flex-shrink:0;}
+.conduct-eval-app .switch input {opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer;z-index:2;}
+.conduct-eval-app .switch .track {position:absolute;inset:0;background:#d7dce3;border-radius:99px;transition:.15s;}
+.conduct-eval-app .switch .thumb {
+  position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;
+  transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+.conduct-eval-app .switch input:checked + .track {background:var(--ce-ok);}
+.conduct-eval-app .switch input:checked + .track + .thumb {transform:translateX(20px);}
+.conduct-eval-app .table-responsive {width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--ce-radius);border:1px solid var(--ce-border);}
+.conduct-eval-app .skills-table {width:100%;border-collapse:collapse;background:var(--ce-surface);min-width:500px;}
+.conduct-eval-app .skills-table th {background:var(--ce-accent-light);color:#7a3712;font-size:11.5px;padding:8px 4px;text-align:center;font-weight:700;}
+.conduct-eval-app .skills-table th.th-name {text-align:left;padding-left:12px;}
+.conduct-eval-app .skills-table td {padding:8px 4px;border-top:1px solid #f0f2f5;font-size:13px;text-align:center;vertical-align:middle;}
+.conduct-eval-app .skills-table td.td-name {text-align:left;padding-left:12px;}
+.conduct-eval-app .skills-table tr:nth-child(odd) {background:#fcfcfd;}
+.conduct-eval-app .lvl-pill {
+  width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ce-border);background:#fff;
+  font-size:13px;font-weight:700;color:var(--ce-muted);display:inline-flex;align-items:center;justify-content:center;
+  margin:0 1px;transition:.12s;touch-action:manipulation;
+}
+.conduct-eval-app .lvl-pill.active {background:var(--ce-accent);border-color:var(--ce-accent);color:#fff;}
+.conduct-eval-app .skills-legend {display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--ce-muted);margin:8px 2px 10px;}
+.conduct-eval-app .skills-legend span b {color:var(--ce-accent);}
+.conduct-eval-app .footerbar {
+  position:sticky;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ce-border);
+  padding:8px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+  box-shadow:0 -3px 12px rgba(0,0,0,.06);z-index:5;font-size:11.5px;margin-top:12px;border-radius:0 0 var(--ce-radius) var(--ce-radius);
+}
+.conduct-eval-app .save-status {font-size:11.5px;color:var(--ce-muted);display:flex;align-items:center;gap:5px;}
+.conduct-eval-app .save-status .dot {width:7px;height:7px;border-radius:50%;background:var(--ce-ok);}
+.conduct-eval-app dialog {border:none;border-radius:var(--ce-radius);padding:0;width:min(500px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.conduct-eval-app dialog::backdrop {background:rgba(15,25,40,.5);}
+.conduct-eval-app .modal-head {background:var(--ce-primary);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;}
+.conduct-eval-app .modal-body {padding:14px;max-height:60vh;overflow:auto;}
+.conduct-eval-app .modal-foot {padding:10px 14px;border-top:1px solid var(--ce-border);display:flex;justify-content:flex-end;gap:8px;}
+.conduct-eval-app .student-row {display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #f0f2f5;}
+.conduct-eval-app .student-row input[type=text] {flex:1;border:1.5px solid var(--ce-border);border-radius:7px;padding:6px 8px;font-size:13px;}
+.conduct-eval-app .add-student-row {display:flex;gap:6px;margin-top:10px;}
+.conduct-eval-app .add-student-row input {flex:1;border:1.5px solid var(--ce-border);border-radius:7px;padding:7px 9px;font-size:13px;}
+.conduct-eval-app .icon-btn {width:32px;height:32px;border-radius:7px;border:none;background:#f0f2f5;color:var(--ce-muted);display:flex;align-items:center;justify-content:center;font-size:14px;}
+.conduct-eval-app #printArea {display:none;}
+.conduct-eval-app .empty-state {text-align:center;padding:40px 16px;color:var(--ce-muted);}
+.conduct-eval-app .empty-state .big {font-size:36px;margin-bottom:8px;}
+@media print {
+/* លាក់ទាំងទំព័រ (រួមទាំង Sidebar និង Tab ដទៃទៀតរបស់ប្រព័ន្ធមេ) លើកលែងតែ #printArea */
+body * {visibility:hidden;}
+#printArea, #printArea * {visibility:visible;}
+#printArea {display:block !important;position:absolute;left:0;top:0;width:100%;}
+.conduct-eval-app .page {page-break-after:always;padding:14px 26px;}
+.conduct-eval-app .page:last-child {page-break-after:auto;}
+@page{margin:10mm;}
+}
+.conduct-eval-app .report-head {text-align:center;margin-bottom:8px;}
+.conduct-eval-app .report-head .school {font-size:15px;font-weight:800;}
+.conduct-eval-app .report-head .title {font-size:13.5px;font-weight:800;color:var(--ce-primary-dark);margin-top:3px;}
+.conduct-eval-app .report-head .year {font-size:11px;color:var(--ce-muted);margin-top:2px;}
+.conduct-eval-app .report-meta {display:flex;justify-content:space-between;font-size:11.5px;margin:10px 0 6px;font-weight:600;}
+.conduct-eval-app .report-table {width:100%;border-collapse:collapse;margin-top:4px;}
+.conduct-eval-app .report-table th, .conduct-eval-app .report-table td {border:1px solid #333;padding:2.5px 6px;font-size:10px;line-height:1.35;}
+.conduct-eval-app .report-table th {background:#eef1f5;}
+.conduct-eval-app .report-cat-title {background:#f5f5f5;font-weight:700;}
+.conduct-eval-app .report-total-row td {font-weight:800;background:#fafafa;}
+.conduct-eval-app .report-final {margin-top:8px;font-size:11px;font-weight:700;display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+.conduct-eval-app .report-final .box {border:1.4px solid #333;border-radius:4px;width:13px;height:13px;display:inline-block;position:relative;vertical-align:middle;margin-right:3px;}
+.conduct-eval-app .report-final .box.checked::after {content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;}
+.conduct-eval-app .report-sign {display:flex;justify-content:space-between;margin-top:16px;font-size:11px;text-align:center;}
+.conduct-eval-app .report-sign .col {width:45%;}
+.conduct-eval-app .report-sign .date-line {margin-bottom:26px;}
+
+</style>
 </head>
 <body>
 
@@ -844,13 +1056,74 @@
 
     <!-- TAB: EMBEDDED SYSTEM — ប្រព័ន្ធវាយតម្លៃបំណិននិងចរិយាសម្បទា-->
     <div id="tab-conduct-eval" class="section">
-        <iframe
-            id="conduct-eval-frame"
-            src="https://script.google.com/macros/s/AKfycbyd542iVn3f32l5A-3mRDILqD9jBVzRuHbBSLXn_QziKxYF_SzVOWNzGdvMJI_0NGwS8A/exec"
-            style="width:100%; height:100%; border:none; border-radius:var(--radius);"
-            loading="lazy">
-        </iframe>
+<div class="conduct-eval-app">
+<script id="conduct-data" type="application/json">[{"name": "ស្អាត", "items": ["ការធ្វើអនាម័យខ្លួនប្រាណជាប្រចាំ", "កាត់ក្រចកដៃ - ជើង", "ដុសសម្អាតមាត់ ធ្មេញជាប្រចាំ", "ការធ្វើអនាម័យទីកន្លែងរស់នៅជាប្រចាំ", "ការដុស សម្អាតទ្រនាប់ជើងស្ងួត ទ្រនាប់ជើងស្អាតជាប្រចាំ", "សម្លៀកបំពាក់ សិស្សស្អាត ជាប្រចាំ", "ចេះទុកដាក់សំរាមដោយខ្លួនឯង", "សម្អាតបន្ទប់ទឹកជាប្រចាំ", "សម្អាតថ្នាក់រៀនជាប្រចាំ", "សម្អាតបរិស្ថានសាលារៀនជាប្រចាំ", "ស្រឡាញ់ភាពស្អាត និងប្រកាន់ឥរិយាបថស្អាតជាប្រចាំ", "សម្អាតសម្ភារៈសិក្សា ដូចជាក្តារឆ្នួន កាតាប សៀវភៅជាប្រចាំ", "មិនខាកស្តោះផ្តេសផ្តាសតាមទីសាធារណៈ", "មិនបន្ទោរបង់ក្រៅបង្គន់", "បរិភោគចំណីអាហារដែលមានសុវត្ថិភាពជាប្រចាំ", "ប្រើប្រាស់ និងទទួលទានទឹកស្អាតជាប្រចាំ"]}, {"name": "សុភាព", "items": ["ប្រើប្រាស់ពាក្យសម្តី ពីរោះ រាបសារ ចេះគួរសម និងផ្តល់ស្នាមញញឹមដាក់គ្នា", "ញញឹមស្រស់", "ប្រតិបត្តិល្អចំពោះមិត្តភក្តិ", "ប្រតិបត្តិល្អចំពោះចាស់ព្រឹទ្ធាចារ្យ", "ប្រតិបត្តិល្អចំពោះម្តាយឳពុក", "ប្រតិបត្តិល្អចំពោះលោកគ្រូ អ្នកគ្រូ នាយក នាយិកា", "ប្រតិបត្តិល្អចំពោះ ព្រះសង្ឃ", "ការសំពះ ដើម្បីបង្ហាញការគោរព និងការគួរសមដូចជា៖ ការសំពះបួងសួងដល់ទេវតាវត្ថុសក្តិសិទ្ធិ ព្រះសង្ឃ ចាស់ព្រឹទ្ធាចារ្យ លោកគ្រូ អ្នកគ្រូ ឳពុកម្តាយ បងប្រុស ស្រី អ្នកមានអាយុច្រើនជាង មិត្តភក្តិ និងអ្នកមានអាយុស្មើគ្នា", "មិត្តជួយអប់រំមិត្ត និងគោរពគ្នាទៅវិញទៅមក", "មិនពោលពាក្យមិនល្អ", "មិនមានការច្រណែនឈ្នានីសអ្នកដទៃ", "សុំអនុញ្ញាតពីគ្រូ មាតាបិតា ចាស់ព្រឹទ្ធាចារ្យមុននឹងធ្វើអ្វីមួយ", "ចេះជួយយកអាសាអ្នកដទៃ", "ចៀសវាងពាក់មួកក្នុងបរិវេណសាលារៀន វត្តអារាម", "ដោះមួកគោរពគ្រូ ចាស់ព្រឹទ្ធាចារ្យ ព្រះសង្ឃ", "ចេះលើកដៃសំពះសុំទោសពេលខ្លួនមានកំហុស", "ចៀសវាងលេងហ្គេម អាន ឬមើលរឿងអាសអាភាស", "មានចរិតស្លូតបូត", "ស្មោះត្រង់ មិននិយាយកុហក", "មិនយករបស់ទ្រព្យមិត្តភក្តិ ឬអ្នកដទៃ", "មិនសេពគប់ជាមួយមិត្តខិលខូច", "មិនពាក់គ្រឿងអលង្ការ តែងខ្លួនឆើតឆាយ"]}, {"name": "របៀប", "items": ["ការទុកដាក់សម្ភារៈសិក្សាត្រឹមត្រូវ", "ទុកដាក់ស្បែកជើងនៅមុខ ឬក្រៅថ្នាក់(បើមាន)", "ការឈរតម្រង់ជួរមានសណ្ដាប់ធ្នាប់", "ការទុកដាក់កង់ ឬម៉ូតូត្រូវតាមកន្លែង", "មិនជជែក ឬប្រឡែងគ្នាពេលគោរពទង់ជាតិ", "មិនជជែក ឬប្រឡែងគ្នាពេលកំពុងរៀនមិនជាន់លើតុ កៅអី", "មិនជិះកង់ ឬម៉ូតូក្នុងបរិវេណសាលារៀន", "មិនធ្វើឱ្យខូចខាតទ្រព្យរបស់ផ្សេងៗ", "ឡើងដើមឈើ ទីខ្ពស់ផ្តេសផ្តាស ឬដោយគ្មានការអនុញ្ញាត", "ជម្រាបសួរ ជម្រាបលា ឪពុកម្តាយ អ្នកអាណាព្យាបាលមុនទៅសាលារៀន ឬមកពីសាលារៀន", "រាយការណ៍ជាបន្ទាន់ជូននាយក ឬគ្រូបង្រៀនពេលមានបាតុភាពអសកម្ម", "សិស្សឱ្យចេះសម្អាតខ្លួនប្រាណ", "សិស្សឱ្យចេះសម្អាតស្លៀកសម្លៀកបំពាក់ ទ្រនាប់ជើង ស្រោមជើង", "កាត់សក់ខ្លី(បុរស) សិតសក់ ចង ឬកៀបសក់ឱ្យមានរបៀប(នារី)", "រៀបចំផ្ទះសម្បែង បន្ទប់គេង សម្ភារៈប្រើប្រាស់", "ចេះទុកដាក់សំរាម និងរើសសំរាមដាក់ចូលធុងសំរាម", "កំណត់បានប្រភេទសម្លៀកបំពាក់ប្រចាំថ្ងៃ និងសម្លៀកបំពាក់សម្រាប់កម្មវិធីផ្សេងៗ", "ចេះទទួលបដិសណ្ឋារកិច្ចចំពោះភ្ញៀវជាតិ និងអន្តរជាតិ។"]}, {"name": "ទៀងពេល", "items": ["មករៀនបានទៀងទាត់ និងទាន់ពេល", "ចូលរួមគោរពទង់ជាតិទៀងទាត់", "ពេលឈប់សម្រាកត្រូវមានច្បាប់ទម្លាប់ និងមូលហតុ", "ខិតខំធ្វើកិច្ចការ និងខិតខំរៀនសូត្រជាប្រចាំ", "មិនឈប់លេងតាមផ្លូវពេលចេញពីសាលារៀនទៅផ្ទះ ឬពីផ្ទះទៅសាលារៀន", "កំណត់ពេលវេលាធ្វើកិច្ចការ និងការធ្វើកិច្ចការជាទៀងទាត់", "គោរពពេលវេលាជាប្រចាំ", "ហាត់ប្រាណថែរក្សាសុខភាពជាប្រចាំ"]}, {"name": "សមាធិ", "items": ["ប្រមូលអារម្មណ៍ ត្រងត្រាប់ស្តាប់ការណែនាំរបស់លោកគ្រូ អ្នកគ្រូ", "ការតាំងចិត្តស្តាប់សំឡេងខាងក្នុង", "ការអត់ធ្មត់ស្ដាប់ខ្យល់ដង្ហើមចេញចូល", "ហ្វឹកហាត់ស្រូប និងបញ្ចេញខ្យល់ដង្ហើមចេញ ចូលឱ្យវែងៗ យឺតៗ", "ហ្វឹកហាត់ប្រមូលអារម្មណ៍ដោយធ្វើសេចក្តីពិចារណានូវសកម្មភាពល្អៗដែលបានប្រព្រឹត្តប្រចាំថ្ងៃ", "មានសុខភាពល្អ ស្មារតីក្លៀវក្លា ស្វាហាប់ និងថ្លាអារម្មណ៍គិតអ្វីៗក្នុងផ្លូវវិជ្ជមានល្អជានិច្ច", "ស្វែងយល់ពីទង្វើល្អ និងព្យាយាមធ្វើអំពើល្អនោះជាប្រចាំ", "ធ្វើអំពើល្អជានិច្ច", "ធ្វើអ្វីដែលជាគុណប្រយោជន៍ចំពោះខ្លួនឯង គ្រួសារ សាលារៀន និងសង្គម", "ចេះត្រិះរិះពិចារណារកហេតុផល", "ហ៊ានទទួលខុសត្រូវចំពោះទង្វើរបស់ខ្លួន", "ប្រមូលអារម្មណ៍ យកចិត្តទុកដាក់រៀនសូត្រ", "ចេះទប់ និងរម្ងាប់អារម្មណ៍", "ប្រកាន់ខ្ជាប់សីល៥ អប់រំផ្លូវចិត្ត"]}]</script>
+<script id="skills-data" type="application/json">["បង្រៀនបន្ថែមម៉ោងតាមមុខវិជ្ជាគោល ភាសាខ្មែរ គណិតវិទ្យា រូបវិទ្យា គីមីវិទ្យា ជីវវិទ្យា ប្រវត្តិវិទ្យា និងភាសាបរទេស", "ការអប់រំឌីជីថល", "អំណានក្នុងបណ្ណាល័យ", "ពង្រឹងការសរសេតាមអាន តែងសេចក្តី គណិតវិទ្យា និងវិទ្យាសាស្ត្រ", "ការស្រាវជ្រាវជាគម្រោង", "ស្វ័យសិក្សាបន្ថែមតាមបណ្ណាល័យ ក្លឹបសិក្សា តាមបណ្តុំ និងនៅផ្ទះអានសៀវភៅ ឬសន្លឹកកិច្ចការ ឬធ្វើកិច្ចការផ្ទះ និងឯកសារផ្សេងៗទៀត", "ជួយសិស្សរៀនយឺត", "ការរៀបចំកម្មវិធីទស្សនកិច្ចសិក្សា/ការរៀបចំកម្មវិធីចុះសង្កេតការងារ", "ការងារស្ម័គ្រចិត្ត និងអភិវឌ្ឍបំណិនទន់", "ការអប់រំតាមបែបសាសនា", "ការអប់រំចរិយាធម៌", "ការអប់រំសុខភាព", "ប្រឹក្សាអាជីព", "បំណិនជីវិតមូលដ្ឋាន", "កម្មវិធីអភិវឌ្ឍយុវជន"]</script>
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">📋</div>
+    <div>
+      <h1>ប្រព័ន្ធវាយតម្លៃសិស្ស</h1>
+      <div class="sub" id="metaSubline">កំពុងទាញយកទិន្នន័យ...</div>
     </div>
+  </div>
+  <div class="actions">
+    <button class="btn btn-white" onclick="exportPDF('current')">🖨️ PDF (សិស្សនេះ)</button>
+    <button class="btn btn-white" onclick="exportPDF('all')">📚 PDF (ទាំងអស់)</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <div class="metabar">
+      <div class="field grow">
+        <label>ឈ្មោះសាលា</label>
+        <input type="text" id="schoolName" oninput="onMetaChange()">
+      </div>
+      <div class="field">
+        <label>ថ្នាក់</label>
+        <select id="classSelect" onchange="onClassChange()"></select>
+      </div>
+      <div class="field">
+        <label>ឆ្នាំសិក្សា</label>
+        <input type="text" id="schoolYear" oninput="onMetaChange()">
+      </div>
+      <div class="student-select-wrap">
+        <div class="field">
+          <label>ជ្រើសរើសសិស្ស</label>
+          <select id="studentSelectCE" onchange="selectStudent(this.value)"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mainContent"></div>
+</div>
+
+<div class="footerbar">
+  <div class="save-status"><span class="dot"></span> <span id="saveStatus">ភ្ជាប់ Firebase</span></div>
+  <div>សិស្សក្នុងថ្នាក់៖ <b id="studentCountFoot">0</b> នាក់</div>
+</div>
+
+<dialog id="manageDialog">
+  <div class="modal-head">
+    <h3 style="font-size:14px;">សិស្សក្នុងថ្នាក់</h3>
+    <button class="icon-btn" style="background:rgba(255,255,255,.2);color:#fff" onclick="document.getElementById('manageDialog').close()">✕</button>
+  </div>
+  <div class="modal-body">
+    <p style="color:var(--muted);font-size:12px;margin:0 0 10px;">
+      បញ្ជីសិស្សនេះទាញមកពីប្រព័ន្ធគ្រប់គ្រងសាលា។ ដើម្បីបន្ថែម/កែ/លុបសិស្ស សូមប្រើប្រព័ន្ធគ្រប់គ្រងសាលា។
+    </p>
+    <div id="studentListModal"></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-outline btn-sm" onclick="document.getElementById('manageDialog').close()">បិទ</button>
+  </div>
+</dialog>
+
+<div id="printArea"></div>
+</div>
+</div>
 
     <!-- TAB 9: ADMIN DATA ENTRY -->
     <div id="tab-data-entry" class="section">
@@ -1221,12 +1494,15 @@ function getUnifiedStudents() {
 }
 
     // --- FIREBASE CONFIG ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyBxGMMqlZb56vjpozo8soT1byJ9GXvuFu0",
-      authDomain: "sotip-system.firebaseapp.com",
-      databaseURL: "https://sotip-system-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "sotip-system",	
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyBxGMMqlZb56vjpozo8soT1byJ9GXvuFu0",
+  authDomain: "sotip-system.firebaseapp.com",
+  databaseURL: "https://sotip-system-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sotip-system",
+  storageBucket: "sotip-system.firebasestorage.app",
+  messagingSenderId: "854683691449",
+  appId: "1:854683691449:web:077df2e0ea512045856e68"
+};
 
     let db = null;
     let isFirebaseConnected = false;
@@ -1261,6 +1537,15 @@ function getUnifiedStudents() {
     function applyRolePermissions(role, teacherClass) {
         userRole = role;
         if (teacherClass) assignedClass = teacherClass;
+
+        // ធ្វើបច្ចុប្បន្នភាព class-lock របស់ប្រព័ន្ធវាយតម្លៃឥរិយាបថ/សមត្ថភាព (Merged)
+        // ព្រោះ userRole/assignedClass ទើបតែដឹងច្បាស់នៅពេល Login ជោគជ័យ (មិនមែនពេល window.onload ដំបូងទេ)
+        if (typeof readClassLockFromUrl === 'function') {
+            readClassLockFromUrl();
+            if (typeof populateClassDropdown === 'function') populateClassDropdown();
+            if (typeof applyClassFilter === 'function') applyClassFilter();
+            if (typeof render === 'function') render();
+        }
 
         const classDropdowns = [
             document.getElementById('daily-class'),
@@ -1487,6 +1772,11 @@ function getUnifiedStudents() {
                 loadingText.innerHTML = '❌ មិនអាចទាក់ទងបណ្ណាល័យ Firebase បានទេ!<br><small style="color:red;">សូមពិនិត្យមើលសេវា Internet របស់អ្នក ឬចុចប៊ូតុងខាងក្រោម។</small>';
             }
             return;
+        }
+
+        // ចាប់ផ្តើមប្រព័ន្ធវាយតម្លៃឥរិយាបថ/សមត្ថភាព (Merged — លែងជា iframe ទៀតហើយ)
+        if (typeof initConductEval === 'function') {
+            try { initConductEval(); } catch(e) { console.error('initConductEval error:', e); }
         }
 
         db.ref().on('value', (snapshot) => {
@@ -3622,6 +3912,585 @@ function renderStudents() {
     // After toggle/delete student, also refresh data entry list
     const _origToggle = typeof toggleStudentStatus === 'function' ? toggleStudentStatus : null;
     // Patch: call renderDataEntryStudents after status change (Firebase will trigger reload anyway)
+
+    // ================================================================
+    // ប្រព័ន្ធវាយតម្លៃឥរិយាបថ/សមត្ថភាព — JS (Merged ពី Index2.html)
+    // ================================================================
+const CONDUCT = JSON.parse(document.getElementById('conduct-data').textContent);
+const SKILLS = JSON.parse(document.getElementById('skills-data').textContent);
+const SKILL_LEVELS = ["មិនមាន","តិចតួច","មធ្យម","បង្គួរ","ញឹកញាប់"];
+const CONDUCT_MAX = CONDUCT.reduce((s,c)=>s+c.items.length,0);
+const SKILLS_MAX = SKILLS.length * 4;
+const GRADE_LABELS = ["ខ្សោយ","មធ្យម","ល្អបង្គួរ","ល្អ"];
+
+// កំណត់សម្គាល់៖ ប្រើ Firebase 'db' ដែលភ្ជាប់រួចហើយពីប្រព័ន្ធមេ (គ្មាន initializeApp() ទីពីរទេ)
+
+const DEFAULT_CLASSES = ['7A','7B','8A','8B','9A','9B'];
+let allClasses = [];
+let allStudentsRaw = [];   // បញ្ជីសិស្សគ្រប់ថ្នាក់ ពី students/ (រួមគ្នាជាមួយប្រព័ន្ធគ្រប់គ្រងសាលា)
+let conductEvalData = {};  // ពិន្ទុវាយតម្លៃ ពី conductEval/ (ជាក់ស្តែងសម្រាប់ប្រព័ន្ធនេះ)
+
+// ជាប់ថ្នាក់ពី URL (?class=7A&lock=1) — ពេលបើកពីប្រព័ន្ធគ្រប់គ្រងសាលា ជាគ្រូបន្ទុកថ្នាក់
+let lockedClassFromUrl = null;
+let isClassLocked = false;
+
+let state = {
+  meta: { school: 'អនុវិទ្យាល័យសូទិព្វ', year: '២០២៥-២០២៦' },
+  className: '',
+  activeId: null,
+  students: []
+};
+
+let activeTab = 'conduct';
+let saveTimer = null;
+
+/**
+ * អនុវត្តការជាប់ថ្នាក់ (ហៅពី URL / server inject / postMessage)
+ */
+function applyClassLock(cls, lock){
+  cls = String(cls || '').trim().toUpperCase();
+  if(!cls || !/^[7-9][AB]$/i.test(cls)) return false;
+  lockedClassFromUrl = cls;
+  isClassLocked = !!(lock === true || lock === '1' || lock === 'true');
+  // បើ UI រួចហើយ — refresh dropdown + filter
+  if(document.getElementById('classSelect')){
+    populateClassDropdown();
+    applyClassFilter();
+    if(typeof render === 'function') render();
+  }
+  return true;
+}
+
+/**
+ * អាន class lock ដោយផ្ទាល់ពី login state របស់ប្រព័ន្ធមេ (userRole/assignedClass)
+ * ដោយសារឥឡូវនេះជាទំព័រតែមួយ (គ្មាន iframe/postMessage ទៀត) — គ្រូបន្ទុកថ្នាក់ (teacher)
+ * នឹងជាប់ថ្នាក់របស់ខ្លួនដោយស្វ័យប្រវត្តិ, admin/director មិនជាប់ថ្នាក់ណាមួយទេ
+ */
+function readClassLockFromUrl(){
+  try {
+    if(typeof userRole !== 'undefined' && userRole === 'teacher' &&
+       typeof assignedClass !== 'undefined' && /^[7-9][AB]$/i.test(String(assignedClass || ''))){
+      lockedClassFromUrl = String(assignedClass).trim().toUpperCase();
+      isClassLocked = true;
+    } else {
+      lockedClassFromUrl = null;
+      isClassLocked = false;
+    }
+  } catch(e){
+    console.warn('readClassLockFromUrl', e);
+  }
+}
+
+// គាំទ្រទាំង Firebase (className/class) និង Google Sheets (ថ្នាក់/ClassID)
+function getStudentClassCE(s){
+  if(!s) return '';
+  let raw = (s.className || s.class || s['ថ្នាក់'] || s['ថ្នាក់ទី'] || s.ClassID || s['ClassID'] || '').toString().trim();
+  const m = raw.match(/([7-9][AB])/i);
+  if(m) return m[1].toUpperCase();
+  return raw;
+}
+
+function populateClassDropdown(){
+  const set = new Set(DEFAULT_CLASSES);
+  allStudentsRaw.forEach(s => { if(s.className) set.add(s.className); });
+  allClasses = Array.from(set).sort();
+  const sel = document.getElementById('classSelect');
+  if(!sel) return;
+
+  // គ្រូបន្ទុកថ្នាក់៖ ជាប់តែថ្នាក់ពី URL (មិនបង្ហាញស្លាក)
+  if(isClassLocked && lockedClassFromUrl){
+    if(allClasses.indexOf(lockedClassFromUrl) === -1){
+      allClasses.push(lockedClassFromUrl);
+      allClasses.sort();
+    }
+    sel.innerHTML = `<option value="${lockedClassFromUrl}">ថ្នាក់ ${lockedClassFromUrl}</option>`;
+    sel.value = lockedClassFromUrl;
+    sel.disabled = true;
+    sel.style.opacity = '0.85';
+    sel.style.cursor = 'not-allowed';
+    sel.title = 'អ្នកជាប់តែថ្នាក់ ' + lockedClassFromUrl + ' (គ្រូបន្ទុកថ្នាក់)';
+    state.className = lockedClassFromUrl;
+  } else {
+    const prev = state.className || allClasses[0];
+    sel.innerHTML = allClasses.map(c => `<option value="${c}" ${c===prev?'selected':''}>ថ្នាក់ ${c}</option>`).join('');
+    sel.disabled = false;
+    sel.style.opacity = '';
+    sel.style.cursor = '';
+    sel.title = '';
+    state.className = prev;
+  }
+}
+
+function applyClassFilter(){
+  const list = allStudentsRaw
+    .filter(s => s.className === state.className)
+    .sort((a,b) => a.name.localeCompare(b.name,'km'));
+
+  state.students = list.map(s => {
+    const ce = conductEvalData[s.id] || {};
+    return {
+      id: s.id,
+      name: s.name,
+      gender: s.gender,
+      conduct: ce.conduct || CONDUCT.map(c=>new Array(c.items.length).fill(0)),
+      skills: ce.skills || new Array(SKILLS.length).fill(0),
+      conductGradeOverride: ce.conductGradeOverride || '',
+      skillsGradeOverride: ce.skillsGradeOverride || ''
+    };
+  });
+
+  if(!state.students.find(s => s.id === state.activeId)){
+    state.activeId = state.students.length ? state.students[0].id : null;
+  }
+}
+
+function onClassChange(){
+  // បើជាប់ថ្នាក់ — មិនអោយប្តូរ
+  if(isClassLocked && lockedClassFromUrl){
+    const sel = document.getElementById('classSelect');
+    if(sel) sel.value = lockedClassFromUrl;
+    state.className = lockedClassFromUrl;
+    return;
+  }
+  state.className = document.getElementById('classSelect').value;
+  state.activeId = null;
+  applyClassFilter();
+  render();
+}
+
+function initFirebase(){
+  const loadingText = document.getElementById('metaSubline');
+  if(!db){
+    if(loadingText) loadingText.textContent = '❌ មិនអាចទាក់ទង Firebase បានទេ';
+    return;
+  }
+  db.ref().on('value', (snapshot) => {
+    const data = snapshot.val() || {};
+
+    allStudentsRaw = [];
+    if(data.students){
+      Object.keys(data.students).forEach(key => {
+        const s = data.students[key];
+        const name = (s.name || s['ឈ្មោះសិស្ស'] || s['ឈ្មោះ'] || '').toString().trim();
+        if(!name) return;
+        if((s.status || 'active').toString().toLowerCase() === 'dropped') return;
+        allStudentsRaw.push({
+          id: String(s.id || key),
+          name: name,
+          gender: (s.gender || s['ភេទ'] || 'ប្រុស').toString().trim(),
+          className: getStudentClassCE(s)
+        });
+      });
+    }
+
+    conductEvalData = data.conductEval || {};
+
+    if(data.conductEvalMeta){
+      state.meta.school = data.conductEvalMeta.school || state.meta.school;
+      state.meta.year = data.conductEvalMeta.year || state.meta.year;
+    }
+
+    populateClassDropdown();
+    applyClassFilter();
+    render();
+  }, (error) => {
+    console.error('Firebase Listen Error:', error);
+    if(loadingText) loadingText.textContent = '❌ បរាជ័យក្នុងការតភ្ជាប់ Firebase៖ ' + error.message;
+  });
+}
+
+function triggerSaveActiveStudent(){
+  const student = getActiveStudent();
+  if(!student || !db) return;
+  const el = document.getElementById('saveStatus');
+  el.textContent = 'កំពុងរក្សាទុក...';
+
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    db.ref('conductEval/' + student.id).set({
+      conduct: student.conduct,
+      skills: student.skills,
+      conductGradeOverride: student.conductGradeOverride || '',
+      skillsGradeOverride: student.skillsGradeOverride || ''
+    }, (err) => {
+      el.textContent = err ? '❌ បរាជ័យក្នុងការរក្សាទុក' : 'បានរក្សាទុកទៅ Firebase';
+      if(!err) setTimeout(() => { el.textContent = 'ភ្ជាប់ Firebase'; }, 2500);
+    });
+  }, 500);
+}
+
+function triggerSaveMeta(){
+  if(!db) return;
+  db.ref('conductEvalMeta').update({ school: state.meta.school, year: state.meta.year });
+}
+
+function conductCatTotal(student, catIdx){
+  return student.conduct[catIdx].reduce((a,b)=>a+b,0);
+}
+function conductTotal(student){
+  return student.conduct.reduce((sum,arr)=>sum+arr.reduce((a,b)=>a+b,0),0);
+}
+function skillsTotal(student){
+  return student.skills.reduce((a,b)=>a+b,0);
+}
+function suggestGrade(ratio){
+  if(ratio>=0.9) return 'ល្អ';
+  if(ratio>=0.75) return 'ល្អបង្គួរ';
+  if(ratio>=0.5) return 'មធ្យម';
+  return 'ខ្សោយ';
+}
+function gradeClass(g){
+  if(g==='ល្អ') return 'grade-good';
+  if(g==='ល្អបង្គួរ') return 'grade-fair';
+  if(g==='មធ្យម') return 'grade-avg';
+  return 'grade-weak';
+}
+
+function getActiveStudent(){
+  return state.students.find(s=>s.id===state.activeId) || null;
+}
+
+function render(){
+  document.getElementById('schoolName').value = state.meta.school;
+  document.getElementById('schoolYear').value = state.meta.year;
+  document.getElementById('metaSubline').textContent = state.meta.school + ' • ថ្នាក់ ' + state.className;
+  document.getElementById('studentCountFoot').textContent = state.students.length;
+
+  renderStudentSelect();
+  renderMain();
+}
+
+function renderStudentSelect(){
+  const sel = document.getElementById('studentSelectCE');
+  sel.innerHTML = '';
+  if(state.students.length===0){
+    const opt = document.createElement('option');
+    opt.textContent = 'គ្មានសិស្សក្នុងថ្នាក់នេះ';
+    opt.value = '';
+    sel.appendChild(opt);
+    return;
+  }
+  state.students.forEach((st,idx)=>{
+    const opt = document.createElement('option');
+    opt.value = st.id;
+    opt.textContent = (idx+1) + '. ' + (st.name || '(គ្មានឈ្មោះ)');
+    if(st.id===state.activeId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function selectStudent(id){
+  if(!id) return;
+  state.activeId = id;
+  renderMain();
+}
+
+function renderMain(){
+  const main = document.getElementById('mainContent');
+  const student = getActiveStudent();
+
+  if(!student){
+    main.innerHTML = `
+      <div class="panel empty-state">
+        <div class="big">🧒</div>
+        <h3 style="margin-bottom:6px;font-size:16px;">មិនទាន់មានសិស្សត្រូវវាយតម្លៃ</h3>
+        <p style="margin:0 0 14px;font-size:12.5px;">សូមបន្ថែមសិស្សតាមរយៈផ្នែក "ទិន្នន័យសិស្ស" របស់ប្រព័ន្ធគ្រប់គ្រងសាលា</p>
+      </div>`;
+    return;
+  }
+
+  const cTotal = conductTotal(student);
+  const cRatio = cTotal / CONDUCT_MAX;
+  const cGrade = student.conductGradeOverride || suggestGrade(cRatio);
+
+  const sTotal = skillsTotal(student);
+  const sRatio = sTotal / SKILLS_MAX;
+  const sGrade = student.skillsGradeOverride || suggestGrade(sRatio);
+
+  main.innerHTML = `
+    <div class="summary">
+      <div class="chip blue">
+        <div class="chip-label">១. ចរិយាសម្បទា</div>
+        <div class="chip-value">${cTotal} <small>/ ${CONDUCT_MAX}</small></div>
+        <div class="bar"><div style="width:${(cRatio*100).toFixed(1)}%"></div></div>
+        <div class="chip-foot">
+          <span>ពិន្ទុ/1 : <b>${cRatio.toFixed(2)}</b></span>
+          <span class="grade-tag ${gradeClass(cGrade)}">${cGrade}</span>
+        </div>
+      </div>
+      <div class="chip amber">
+        <div class="chip-label">២. បំណិនសម្បទា</div>
+        <div class="chip-value">${sTotal} <small>/ ${SKILLS_MAX}</small></div>
+        <div class="bar"><div style="width:${(sRatio*100).toFixed(1)}%"></div></div>
+        <div class="chip-foot">
+          <span>ពិន្ទុ/1 : <b>${sRatio.toFixed(2)}</b></span>
+          <span class="grade-tag ${gradeClass(sGrade)}">${sGrade}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab ${activeTab==='conduct'?'active':''}" onclick="switchConductSubTab('conduct')">១. ចរិយាសម្បទា (${CONDUCT_MAX})</div>
+      <div class="tab ${activeTab==='skills'?'active':''}" onclick="switchConductSubTab('skills')">២. បំណិនសម្បទា (${SKILLS.length})</div>
+    </div>
+
+    <div class="tab-panel ${activeTab==='conduct'?'active':''}">
+      <div class="cat-grid">
+        ${CONDUCT.map((cat,ci)=>renderCatCard(cat,ci,student)).join('')}
+      </div>
+      <div class="panel" style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div style="font-weight:700;font-size:13px;">និទ្ទេសចរិយាសម្បទា៖</div>
+        <select onchange="setGradeOverride('conduct', this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;">
+          <option value="" ${!student.conductGradeOverride?'selected':''}>ស្វ័យប្រវត្តិ (${suggestGrade(cRatio)})</option>
+          <option value="ល្អ" ${student.conductGradeOverride==='ល្អ'?'selected':''}>ល្អ</option>
+          <option value="ល្អបង្គួរ" ${student.conductGradeOverride==='ល្អបង្គួរ'?'selected':''}>ល្អបង្គួរ</option>
+          <option value="មធ្យម" ${student.conductGradeOverride==='មធ្យម'?'selected':''}>មធ្យម</option>
+          <option value="ខ្សោយ" ${student.conductGradeOverride==='ខ្សោយ'?'selected':''}>ខ្សោយ</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="tab-panel ${activeTab==='skills'?'active':''}">
+      <div class="skills-legend">
+        ${SKILL_LEVELS.map((l,i)=>`<span><b>${i}</b>=${l}</span>`).join('')}
+      </div>
+      <div class="table-responsive">
+        <table class="skills-table">
+          <thead>
+            <tr>
+              <th class="th-name" style="width:40%;">សកម្មភាព</th>
+              ${SKILL_LEVELS.map((l,i)=>`<th>${i}<br><span style="font-weight:500;font-size:10px;">${l}</span></th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${SKILLS.map((label,si)=>renderSkillRow(label,si,student)).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="panel" style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div style="font-weight:700;font-size:13px;">និទ្ទេសបំណិនសម្បទា៖</div>
+        <select onchange="setGradeOverride('skills', this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;">
+          <option value="" ${!student.skillsGradeOverride?'selected':''}>ស្វ័យប្រវត្តិ (${suggestGrade(sRatio)})</option>
+          <option value="ល្អ" ${student.skillsGradeOverride==='ល្អ'?'selected':''}>ល្អ</option>
+          <option value="ល្អបង្គួរ" ${student.skillsGradeOverride==='ល្អបង្គួរ'?'selected':''}>ល្អបង្គួរ</option>
+          <option value="មធ្យម" ${student.skillsGradeOverride==='មធ្យម'?'selected':''}>មធ្យម</option>
+          <option value="ខ្សោយ" ${student.skillsGradeOverride==='ខ្សោយ'?'selected':''}>ខ្សោយ</option>
+        </select>
+      </div>
+    </div>
+  `;
+}
+
+function renderCatCard(cat,ci,student){
+  const total = conductCatTotal(student,ci);
+  return `
+    <div class="cat-card">
+      <div class="cat-head">
+        <h3>${cat.name}</h3>
+        <div class="cat-score">${total} / ${cat.items.length}</div>
+      </div>
+      <div class="cat-items">
+        ${cat.items.map((item,ii)=>{
+          const checked = student.conduct[ci][ii]===1;
+          return `
+          <div class="item-row">
+            <div class="item-text">${item}</div>
+            <label class="switch">
+              <input type="checkbox" ${checked?'checked':''} onchange="toggleConduct(${ci},${ii},this.checked)">
+              <span class="track"></span>
+              <span class="thumb"></span>
+            </label>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function renderSkillRow(label,si,student){
+  const val = student.skills[si];
+  return `
+    <tr>
+      <td class="td-name">${(si+1)}. ${label}</td>
+      ${SKILL_LEVELS.map((_,lvl)=>`
+        <td>
+          <button class="lvl-pill ${val===lvl?'active':''}" onclick="setSkill(${si},${lvl})">${lvl}</button>
+        </td>`).join('')}
+    </tr>`;
+}
+
+function switchConductSubTab(tab){
+  activeTab = tab;
+  renderMain();
+}
+function toggleConduct(ci,ii,checked){
+  const student = getActiveStudent();
+  if(!student) return;
+  student.conduct[ci][ii] = checked ? 1 : 0;
+  triggerSaveActiveStudent();
+  renderMain();
+}
+function setSkill(si,val){
+  const student = getActiveStudent();
+  if(!student) return;
+  student.skills[si] = val;
+  triggerSaveActiveStudent();
+  renderMain();
+}
+function setGradeOverride(kind,val){
+  const student = getActiveStudent();
+  if(!student) return;
+  if(kind==='conduct') student.conductGradeOverride = val;
+  else student.skillsGradeOverride = val;
+  triggerSaveActiveStudent();
+  renderMain();
+}
+function onMetaChange(){
+  state.meta.school = document.getElementById('schoolName').value;
+  state.meta.year = document.getElementById('schoolYear').value;
+  document.getElementById('metaSubline').textContent = state.meta.school + ' • ថ្នាក់ ' + state.className;
+  triggerSaveMeta();
+}
+
+function openManageModal(){
+  renderManageModal();
+  document.getElementById('manageDialog').showModal();
+}
+function renderManageModal(){
+  const list = document.getElementById('studentListModal');
+  if(state.students.length===0){
+    list.innerHTML = `<p style="color:var(--muted);font-size:13px;">មិនទាន់មានសិស្សក្នុងថ្នាក់នេះទេ។</p>`;
+    return;
+  }
+  list.innerHTML = state.students.map((st,idx)=>`
+    <div class="student-row">
+      <span style="width:20px;color:var(--muted);font-size:12px;">${idx+1}.</span>
+      <span style="flex:1;font-size:13px;">${st.name}</span>
+      <button class="icon-btn" title="កំណត់ពិន្ទុឡើងវិញ" onclick="resetStudentScores('${st.id}')">🔄</button>
+    </div>
+  `).join('');
+}
+function resetStudentScores(id){
+  const st = state.students.find(s=>s.id===id);
+  if(!st) return;
+  if(!confirm('កំណត់ពិន្ទុរបស់ "'+ (st.name||'សិស្សនេះ') +'" ឡើងវិញឬ? (ការវាយតម្លៃទាំងអស់នឹងត្រូវលុប)')) return;
+  st.conduct = CONDUCT.map(c=>new Array(c.items.length).fill(0));
+  st.skills = new Array(SKILLS.length).fill(0);
+  st.conductGradeOverride = '';
+  st.skillsGradeOverride = '';
+  if(state.activeId===id) renderMain();
+  if(db){
+    const el = document.getElementById('saveStatus');
+    el.textContent = 'កំពុងរក្សាទុក...';
+    db.ref('conductEval/' + id).set({
+      conduct: st.conduct, skills: st.skills, conductGradeOverride: '', skillsGradeOverride: ''
+    }, (err) => {
+      el.textContent = err ? '❌ បរាជ័យក្នុងការរក្សាទុក' : 'បានរក្សាទុកទៅ Firebase';
+      setTimeout(() => { el.textContent = 'ភ្ជាប់ Firebase'; }, 2500);
+    });
+  }
+  renderManageModal();
+}
+
+function buildReportPage(student){
+  const cTotal = conductTotal(student);
+  const cRatio = cTotal / CONDUCT_MAX;
+  const cGrade = student.conductGradeOverride || suggestGrade(cRatio);
+
+  const sTotal = skillsTotal(student);
+  const sRatio = sTotal / SKILLS_MAX;
+  const sGrade = student.skillsGradeOverride || suggestGrade(sRatio);
+
+  const conductRows = CONDUCT.map((cat,ci)=>{
+    const rows = cat.items.map((item,ii)=>`
+      <tr>
+        <td style="width:28px;text-align:center;">${ii+1}</td>
+        <td>${item}</td>
+        <td style="width:60px;text-align:center;">${student.conduct[ci][ii]}</td>
+      </tr>`).join('');
+    return `
+      <tr class="report-cat-title"><td colspan="3">${cat.name} (/${cat.items.length})</td></tr>
+      ${rows}
+      <tr class="report-total-row"><td colspan="2" style="text-align:right;">សរុប ${cat.name} =</td><td style="text-align:center;">${conductCatTotal(student,ci)}/${cat.items.length}</td></tr>
+    `;
+  }).join('');
+
+  const skillRows = SKILLS.map((label,si)=>`
+    <tr>
+      <td style="width:28px;text-align:center;">${si+1}</td>
+      <td>${label}</td>
+      <td style="width:60px;text-align:center;">${student.skills[si]}</td>
+    </tr>`).join('');
+
+  const gradeBoxes = (grade)=> GRADE_LABELS.map(g=>`<span><span class="box ${grade===g?'checked':''}"></span>${g}</span>`).join(' &nbsp; ');
+
+  return `
+    <div class="page">
+      <div class="report-head">
+        <div class="school">${state.meta.school}</div>
+        <div class="title">ឧបករណ៍វាយតម្លៃពិន្ទុចរិយាសម្បទា និងបំណិនសម្បទារបស់សិស្ស</div>
+        <div class="year">ថ្នាក់ទី ${state.className} — ឆ្នាំសិក្សា ${state.meta.year}</div>
+      </div>
+      <div class="report-meta">
+        <div>ឈ្មោះសិស្ស៖ ${student.name || '..........................................'}</div>
+        <div>ភេទ៖ ${student.gender}</div>
+        <div>ថ្នាក់៖ ${state.className}</div>
+      </div>
+
+      <div style="font-weight:800;margin-top:6px;font-size:13.5px;">ឧបសម្ព័ន្ធ១ — ចរិយាសម្បទា (/${CONDUCT_MAX})</div>
+      <table class="report-table">
+        <thead><tr><th style="width:28px;">ល.រ</th><th>លក្ខណៈវិនិច្ឆ័យនៃការវាយតម្លៃ</th><th style="width:60px;">ពិន្ទុ</th></tr></thead>
+        <tbody>${conductRows}</tbody>
+      </table>
+      <div class="report-final">
+        <div>ពិន្ទុសរុបចរិយាសម្បទា = ${cTotal} / ${CONDUCT_MAX} &nbsp; ⇒ &nbsp; ពិន្ទុ/1 = ${cRatio.toFixed(2)}</div>
+        <div>និទ្ទេស៖ ${gradeBoxes(cGrade)}</div>
+      </div>
+
+      <div style="font-weight:800;margin-top:18px;font-size:13.5px;">ឧបសម្ព័ន្ធ២ — បំណិនសម្បទា (/${SKILLS_MAX})</div>
+      <table class="report-table">
+        <thead><tr><th style="width:28px;">ល.រ</th><th>សកម្មភាព</th><th style="width:60px;">ពិន្ទុ (0-4)</th></tr></thead>
+        <tbody>${skillRows}</tbody>
+      </table>
+      <div class="report-final">
+        <div>ពិន្ទុសរុបបំណិនសម្បទា = ${sTotal} / ${SKILLS_MAX} &nbsp; ⇒ &nbsp; ពិន្ទុ/1 = ${sRatio.toFixed(2)}</div>
+        <div>និទ្ទេស៖ ${gradeBoxes(sGrade)}</div>
+      </div>
+
+      <div class="report-sign">
+        <div class="col">
+          <div class="date-line">បានឃើញ និងឯកភាព<br>នាយកសាលា</div>
+          ..............................................
+        </div>
+        <div class="col">
+          <div class="date-line">${state.meta.school.replace('អនុវិទ្យាល័យ','')}, ថ្ងៃទី......ខែ......ឆ្នាំ......<br>គ្រូប្រចាំថ្នាក់</div>
+          ..............................................
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function exportPDF(mode){
+  const area = document.getElementById('printArea');
+  let students = [];
+  if(mode==='current'){
+    const st = getActiveStudent();
+    if(!st){ alert('សូមជ្រើសរើសសិស្សជាមុនសិន'); return; }
+    students = [st];
+  } else {
+    if(state.students.length===0){ alert('មិនទាន់មានសិស្សនៅឡើយទេ'); return; }
+    students = state.students;
+  }
+  area.innerHTML = students.map(buildReportPage).join('');
+  window.print();
+}
+
+// ហៅ initConductEval() ពី window.onload សំខាន់នៅចុងបញ្ចប់ Index.html
+// (មិនកំណត់ window.onload នៅទីនេះទេ ព្រោះប្រព័ន្ធមេមាន window.onload ផ្ទាល់ខ្លួនរួចហើយ)
+function initConductEval(){
+  readClassLockFromUrl();
+  initFirebase();
+}
 </script>
 
 
