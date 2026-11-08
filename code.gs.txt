@@ -1,0 +1,189 @@
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Index')
+    .setTitle('ប្រព័ន្ធគ្រប់គ្រងសាលា')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function sheetToObjects(sheetName) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) return [];
+  var values = sheet.getDataRange().getValues();
+  if (values.length < 2) return [];
+  var headers = values[0].map(function(h) { return String(h).trim(); });
+  var rows = [];
+  for (var i = 1; i < values.length; i++) {
+    var obj = {};
+    var empty = true;
+    for (var j = 0; j < headers.length; j++) {
+      if (!headers[j]) continue;
+      var v = values[i][j];
+      obj[headers[j]] = v;
+      if (v !== '' && v !== null) empty = false;
+    }
+    if (!empty) rows.push(obj);
+  }
+  return rows;
+}
+
+function getData() {
+  return {
+    students: sheetToObjects('Students'),
+    parents: sheetToObjects('Parents'),
+    teachers: sheetToObjects('Teachers'),
+    subjects: sheetToObjects('Subjects'),
+    classes: sheetToObjects('Classes'),
+    teacherAssignments: sheetToObjects('TeacherAssignments'),
+    homeroom: sheetToObjects('Homeroom'),
+    subjectTeachers: sheetToObjects('SubjectTeachers'),
+    timetable: sheetToObjects('Schedule')
+  };
+}
+
+function checkLoginCredentials(role, pin) {
+  var pins = {
+    admin: '1234',
+    director: '1234',
+    teacher: '1234'
+  };
+  return pins[role] === String(pin).trim();
+}
+
+function saveTeacherToSheet(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Teachers');
+  if (!sheet) throw new Error('រកមិនឃើញ sheet Teachers');
+
+  var name = String(data.teacherName || '').trim();
+  var phone = String(data.phone || '').trim();
+  var telegram = String(data.telegram || '').trim();
+  if (!name) throw new Error('គ្មានឈ្មោះគ្រូ');
+
+  var values = sheet.getDataRange().getValues();
+  var headers = values[0].map(function(h) { return String(h).trim(); });
+  var idCol = headers.indexOf('TeacherID');
+  var nameCol = headers.indexOf('TeacherName');
+  if (nameCol < 0) nameCol = headers.indexOf('ឈ្មោះ');
+  var phoneCol = headers.indexOf('Phone');
+  if (phoneCol < 0) phoneCol = headers.indexOf('លេខទូរសព្ទ');
+  var tgCol = headers.indexOf('Telegram');
+
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][nameCol]).trim() === name) {
+      if (phoneCol >= 0) sheet.getRange(i + 1, phoneCol + 1).setValue(phone);
+      if (tgCol >= 0) sheet.getRange(i + 1, tgCol + 1).setValue(telegram);
+      return { success: true, updated: true };
+    }
+  }
+
+  var newId = 'T' + String(values.length).padStart(3, '0');
+  var row = [];
+  for (var c = 0; c < headers.length; c++) row.push('');
+  if (idCol >= 0) row[idCol] = newId;
+  if (nameCol >= 0) row[nameCol] = name;
+  if (phoneCol >= 0) row[phoneCol] = phone;
+  if (tgCol >= 0) row[tgCol] = telegram;
+  sheet.appendRow(row);
+  return { success: true, created: true, teacherId: newId };
+}
+
+function saveTeacherAssignment(data) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('TeacherAssignments');
+  if (!sheet) throw new Error('រកមិនឃើញ sheet TeacherAssignments');
+
+  var classId = String(data.classId || '').trim().toUpperCase();
+  var teacherName = String(data.teacherName || '').trim();
+  var subjectName = String(data.subjectName || '').replace(/\s*\(ថ្នាក់\s*[7-9][AB]\)/i, '').trim();
+  var phone = String(data.phone || '').trim();
+  var telegram = String(data.telegram || '').trim();
+
+  saveTeacherToSheet({ teacherName: teacherName, phone: phone, telegram: telegram });
+
+  var teachersSheet = ss.getSheetByName('Teachers');
+  var subjectsSheet = ss.getSheetByName('Subjects');
+  var teacherId = '';
+  var subjectId = '';
+
+  if (teachersSheet) {
+    var tv = teachersSheet.getDataRange().getValues();
+    var th = tv[0].map(function(h) { return String(h).trim(); });
+    var tNameCol = th.indexOf('TeacherName');
+    if (tNameCol < 0) tNameCol = th.indexOf('ឈ្មោះ');
+    var tIdCol = th.indexOf('TeacherID');
+    for (var i = 1; i < tv.length; i++) {
+      if (String(tv[i][tNameCol]).trim() === teacherName) {
+        teacherId = String(tv[i][tIdCol]);
+        break;
+      }
+    }
+  }
+
+  if (subjectsSheet) {
+    var sv = subjectsSheet.getDataRange().getValues();
+    var sh = sv[0].map(function(h) { return String(h).trim(); });
+    var sNameCol = sh.indexOf('SubjectName');
+    if (sNameCol < 0) sNameCol = sh.indexOf('មុខវិជ្ជា');
+    var sIdCol = sh.indexOf('SubjectID');
+    for (var j = 1; j < sv.length; j++) {
+      if (String(sv[j][sNameCol]).trim() === subjectName) {
+        subjectId = String(sv[j][sIdCol]);
+        break;
+      }
+    }
+    if (!subjectId && sIdCol >= 0) {
+      subjectId = 'SUB' + String(sv.length).padStart(2, '0');
+      var srow = [];
+      for (var c = 0; c < sh.length; c++) srow.push('');
+      srow[sIdCol] = subjectId;
+      if (sNameCol >= 0) srow[sNameCol] = subjectName;
+      subjectsSheet.appendRow(srow);
+    }
+  }
+
+  var values = sheet.getDataRange().getValues();
+  var headers = values[0].map(function(h) { return String(h).trim(); });
+  var classCol = headers.indexOf('ClassID');
+  var teacherCol = headers.indexOf('TeacherID');
+  var subjectCol = headers.indexOf('SubjectID');
+  var idCol = headers.indexOf('AssignmentID');
+  var yearCol = headers.indexOf('AcademicYear');
+
+  for (var r = 1; r < values.length; r++) {
+    if (String(values[r][teacherCol]) === teacherId &&
+        String(values[r][subjectCol]) === subjectId &&
+        String(values[r][classCol]).toUpperCase() === classId) {
+      return { success: true, updated: true };
+    }
+  }
+
+  var row = [];
+  for (var c2 = 0; c2 < headers.length; c2++) row.push('');
+  if (idCol >= 0) row[idCol] = 'ASN' + String(values.length).padStart(3, '0');
+  if (teacherCol >= 0) row[teacherCol] = teacherId;
+  if (subjectCol >= 0) row[subjectCol] = subjectId;
+  if (classCol >= 0) row[classCol] = classId;
+  if (yearCol >= 0) row[yearCol] = '2025-2026';
+  if (headers.length > 7) {
+    row[7] = teacherName;
+    row[8] = subjectName;
+  }
+  sheet.appendRow(row);
+  return { success: true, created: true };
+}
+
+function deleteTeacherAssignment(teacherName, classId) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('TeacherAssignments');
+  if (!sheet) return { success: false };
+
+  var values = sheet.getDataRange().getValues();
+  for (var i = values.length - 1; i >= 1; i--) {
+    var rowClass = String(values[i][3] || '').toUpperCase();
+    var rowName = String(values[i][7] || '').trim();
+    if (rowClass === String(classId).toUpperCase() && rowName === String(teacherName).trim()) {
+      sheet.deleteRow(i + 1);
+    }
+  }
+  return { success: true };
+}

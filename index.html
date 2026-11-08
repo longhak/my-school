@@ -1,0 +1,3720 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <script src="firebase-config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ប្រព័ន្ធគ្រប់គ្រងសាលារៀន និងវត្តមានសិស្ស</title>
+
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/"></script>
+    <script src="https://www.gstatic.com/firebasejs/"></script>
+
+    <!-- html2pdf Library សម្រាប់ Export ជា PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+
+    <!-- PWA Settings -->
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/6614/6614679.png">
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --primary-hover: #4338ca;
+            --secondary: #06b6d4;
+            --success: #10b981;
+            --success-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            --telegram: #0284c7;
+            --telegram-gradient: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.04);
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Kantumruy Pro', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        /* Navigation Sidebar */
+        .sidebar {
+            width: 280px; 
+            background: var(--card-bg); 
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 1rem; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.4rem;
+            position: fixed; 
+            height: 100vh; 
+            z-index: 20;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+            overflow-y: auto;
+        }
+        
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0 0.5rem 1.2rem 0.5rem;
+            border-bottom: 2px solid var(--bg);
+            margin-bottom: 0.5rem;
+        }
+        
+        .brand-icon {
+            width: 40px; height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 { color: var(--text); font-size: 1.1rem; font-weight: 700; }
+        .sidebar-category { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 0.8rem 0 0.3rem 0.5rem; }
+
+        .nav-btn {
+            background: transparent; 
+            border: none; 
+            padding: 0.75rem 1rem; 
+            border-radius: 12px;
+            color: var(--text-muted); 
+            text-align: left; 
+            font-size: 0.9rem; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .nav-btn:hover { background: #f1f5f9; color: var(--primary); transform: translateX(4px); }
+        .nav-btn.active { 
+            background: var(--primary-gradient); 
+            color: white; 
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+        }
+
+        /* Main Area */
+        .main-content { margin-left: 280px; flex: 1; padding: 2rem; width: calc(100% - 280px); }
+        .section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title { font-size: 1.35rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+
+        /* Controls & Form Layouts */
+        .control-panel { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 12px; 
+            background-color: var(--card-bg); 
+            padding: 1rem; 
+            border-radius: var(--radius); 
+            margin-bottom: 1.25rem; 
+            border: 1px solid var(--border); 
+            box-shadow: var(--shadow-sm);
+            align-items: end;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-weight: 600; font-size: 0.85rem; color: var(--text-muted); }
+
+        input[type="date"], input[type="month"], input[type="text"], input[type="password"], input[type="file"], select, .select-box { 
+            padding: 0.65rem 0.85rem; 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            border: 1.5px solid var(--border); 
+            border-radius: 10px; 
+            font-size: 0.9rem; 
+            width: 100%; 
+            background-color: #ffffff; 
+            color: var(--text);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .select-wrapper-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        /* Buttons */
+        .btn-action { 
+            background: var(--primary-gradient); 
+            color: white; 
+            border: none; 
+            padding: 0.7rem 1.1rem; 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            font-size: 0.88rem; 
+            font-weight: 600; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            display: inline-flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 6px; 
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25); 
+            transition: all 0.2s ease;
+            text-decoration: none;
+            width: 100%;
+            white-space: nowrap;
+        }
+
+        .btn-action:hover { transform: translateY(-2px); }
+        .btn-action:active { transform: scale(0.98); }
+        .btn-danger { background: linear-gradient(135deg, #f87171 0%, #dc2626 100%); box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25); }
+        .btn-warning { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); box-shadow: 0 4px 10px rgba(217, 119, 6, 0.25); }
+        .btn-success { background: var(--success-gradient); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25); }
+        .btn-purple { background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%); box-shadow: 0 4px 10px rgba(147, 51, 234, 0.25); }
+        
+        .btn-call-full {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--success-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            box-sizing: border-box;
+            margin-top: 6px;
+        }
+
+        .icon-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .btn-icon-only {
+            flex: 1;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon-only.btn-call { background: var(--success-gradient); }
+        .btn-icon-only.btn-telegram { background: var(--telegram-gradient); }
+        .btn-icon-only:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Table & Mobile Customization */
+        .table-responsive { 
+            width: 100%;
+            overflow-x: auto; 
+            background: var(--card-bg); 
+            border-radius: var(--radius); 
+            box-shadow: var(--shadow-md); 
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.88rem; min-width: 500px; }
+        th, td { border: 1px solid var(--border); padding: 0.65rem 0.4rem; white-space: nowrap; }
+        th { background-color: #f8fafc; color: var(--text-muted); font-weight: 700; font-size: 0.82rem; text-transform: uppercase; }
+        
+        .td-normal, table td:nth-child(1), table td:nth-child(2) {
+            font-weight: normal !important;
+        }
+
+        .day-header { font-size: 10px; background-color: #e2e8f0; color: var(--text); }
+        .text-left { text-align: left; padding-left: 8px; }
+
+        .status-btn { 
+            padding: 4px 6px; 
+            border-radius: 6px; 
+            border: 1px solid var(--border); 
+            font-family: 'Kantumruy Pro', sans-serif; 
+            font-weight: 600; 
+            width: 100%; 
+            font-size: 0.82rem;
+            outline: none;
+        }
+
+        .status-p { background-color: #dcfce7; color: #166534; }
+        .status-a { background-color: #fee2e2; color: #991b1b; }
+        .status-l { background-color: #fef3c7; color: #92400e; }
+
+        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; background: #e0e7ff; color: var(--primary); }
+        .badge-active { background-color: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 11px; }
+        .badge-dropped { background-color: #fee2e2; color: #b91c1c; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 11px; }
+
+        .schedule-nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg);
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .day-nav-btn {
+            background: #e0e7ff;
+            color: var(--primary);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .day-nav-btn:hover { background: var(--primary); color: white; }
+
+        /* Card Views */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+        .student-card { background: var(--card-bg); border-radius: var(--radius); padding: 1.25rem; border: 1px solid var(--border); box-shadow: var(--shadow-md); display: flex; flex-direction: column; justify-content: space-between; gap: 0.8rem; }
+        .action-card { background: var(--card-bg); border-radius: 20px; padding: 1.25rem; box-shadow: var(--shadow-lg); border: 1px solid var(--border); max-width: 500px; width: 100%; margin: 0.5rem auto; display: flex; flex-direction: column; gap: 1.25rem; position: relative; overflow: hidden; }
+        .action-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: var(--primary-gradient); }
+
+        .contact-header { display: flex; align-items: center; gap: 0.75rem; }
+        .avatar { width: 44px; height: 44px; border-radius: 12px; background: #e0e7ff; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: bold; flex-shrink: 0; }
+        .avatar.parent-avatar { background: #fef3c7; color: #d97706; }
+        .contact-info { flex: 1; }
+        .contact-name { font-size: 1rem; font-weight: 700; color: var(--text); }
+        .contact-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.1rem; }
+        .info-item { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 0.4rem; align-items: center; margin-top: 0.4rem; }
+        .divider { border: none; border-top: 1px dashed var(--border); }
+
+        .search-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-sm); }
+        .admin-only { display: none; }
+
+        /* បំពេញទិន្នន័យ — សម្រាប់តែកុំព្យូទ័រប៉ុណ្ណោះ, លាក់ចេញលើទូរស័ព្ទដៃ/ថេប្លេត */
+        @media (max-width: 900px) {
+            #btn-nav-data-entry, #tab-data-entry { display: none !important; }
+        }
+
+        /* ប្រព័ន្ធវាយតម្លៃឥរិយាបថ/សមត្ថភាព — Embedded iframe */
+        #tab-conduct-eval.active { display: flex; flex-direction: column; height: calc(100vh - 40px); }
+        #tab-conduct-eval .section-header { flex-shrink: 0; }
+        #conduct-eval-frame { flex: 1; }
+        @media (max-width: 900px) {
+            #tab-conduct-eval.active { height: auto; }
+        }
+
+        #loading-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.95); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            font-size: 15px; font-weight: bold; color: var(--primary); z-index: 9999; 
+            padding: 20px; text-align: center;
+        }
+
+        .error-msg { background: #fef2f2; color: #dc2626; padding: 1rem 1.25rem; border-radius: 12px; font-weight: 600; border: 1px solid #fecaca; margin-bottom: 1.5rem; }
+
+        /* Mobile Optimization */
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+            .sidebar { 
+                width: 100%; 
+                height: auto; 
+                position: relative; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+                padding: 0.6rem; 
+                flex-direction: row; 
+                overflow-x: auto; 
+                align-items: center; 
+                background: #ffffff;
+            }
+            .sidebar-brand { border-bottom: none; padding: 0; margin-bottom: 0; margin-right: 0.5rem; }
+            .sidebar h2, .sidebar-category { display: none; }
+            .main-content { margin-left: 0; width: 100%; padding: 0.8rem; }
+            .nav-btn { white-space: nowrap; padding: 0.5rem 0.8rem; font-size: 0.82rem; border-radius: 8px; }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; margin-bottom: 1rem; }
+            .section-title { font-size: 1.15rem; }
+            .control-panel { grid-template-columns: 1fr; padding: 0.8rem; gap: 10px; }
+            .select-wrapper-group { flex-direction: column; width: 100%; max-width: 100%; }
+            .col-id { display: none !important; }
+
+            table { font-size: 0.8rem; min-width: 100%; }
+            th, td { padding: 0.5rem 0.3rem; }
+            
+        }
+
+        /* Monthly sticky columns - works on all screen sizes */
+        #tab-monthly .sticky-col-1 {
+            position: sticky;
+            left: 0;
+            background-color: #ffffff !important;
+            z-index: 4;
+            min-width: 36px;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.04);
+        }
+        #tab-monthly .sticky-col-2 {
+            position: sticky;
+            left: 36px;
+            background-color: #ffffff !important;
+            z-index: 4;
+            min-width: 120px;
+            max-width: 160px;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.04);
+        }
+        #tab-monthly .sticky-col-3 {
+            position: sticky;
+            left: 156px;
+            background-color: #ffffff !important;
+            z-index: 4;
+            min-width: 40px;
+            box-shadow: 3px 0 6px rgba(0,0,0,0.06);
+        }
+        #tab-monthly thead .sticky-col-1,
+        #tab-monthly thead .sticky-col-2,
+        #tab-monthly thead .sticky-col-3 {
+            background-color: #f8fafc !important;
+            z-index: 6;
+        }
+        #tab-monthly thead th {
+            z-index: 3;
+            background-color: #f8fafc;
+        }
+
+        @media print {
+            @page { size: A4 landscape; margin: 8mm; }
+            body { padding: 0; background: white; font-size: 10px; }
+            .sidebar, .control-panel, .btn-action, .search-card, .schedule-nav-header, #loginModal { display: none !important; }
+            .main-content { margin-left: 0; width: 100%; padding: 0; }
+            .col-id { display: table-cell !important; }
+            table { width: 100% !important; font-size: 9px !important; }
+            th, td { padding: 3px 1px !important; }
+            th { background-color: #e2e8f0 !important; color: black !important; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Modal Overlay -->
+<div id="loginModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.95); display:flex; align-items:center; justify-content:center; z-index:10000;">
+    <div style="background:white; padding:2rem; border-radius:16px; width:90%; max-width:400px; text-align:center; box-shadow:0 20px 25px -5px rgba(0,0,0,0.3);">
+        <h2 style="margin-bottom:0.5rem; color:#1e293b;">🏫 ប្រព័ន្ធគ្រប់គ្រងសាលារៀន</h2>
+        <p style="font-size:0.85rem; color:#64748b; margin-bottom:1.5rem;">សូមជ្រើសរើសតួនាទី និងបញ្ចូលលេខកូដសម្ងាត់</p>
+        
+        <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+            <div class="form-group">
+                <label>តួនាទី (Role)៖</label>
+                <select id="modalRole" onchange="toggleTeacherClassInput()">
+                    <option value="admin">1. Admin (អ្នកគ្រប់គ្រងប្រព័ន្ធ)</option>
+                    <option value="director">2. នាយក (Director)</option>
+                    <option value="teacher">3. គ្រូបន្ទុកថ្នាក់ (Teacher)</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="teacherClassGroup" style="display:none;">
+                <label>ថ្នាក់ដែលទទួលបន្ទុក៖</label>
+                <select id="modalClass">
+                    <option value="7A">ថ្នាក់ 7A</option>
+                    <option value="7B">ថ្នាក់ 7B</option>
+                    <option value="8A">ថ្នាក់ 8A</option>
+                    <option value="8B">ថ្នាក់ 8B</option>
+                    <option value="9A">ថ្នាក់ 9A</option>
+                    <option value="9B">ថ្នាក់ 9B</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>លេខកូដសម្ងាត់ (Password)៖</label>
+                <input type="password" id="modalPin" placeholder="បញ្ចូលលេខកូដសម្ងាត់...">
+            </div>
+
+            <button type="button" id="loginBtn" class="btn-action" style="margin-top:10px;" onclick="handleLogin()">🔑 ចូលប្រើប្រាស់</button>
+        </div>
+    </div>
+</div>
+
+<div id="loading-overlay">
+    <div id="loading-text">⚡ កំពុងតភ្ជាប់ទៅ Firebase / Google Sheet...</div>
+    <br>
+    <button id="btn-skip" class="btn-action btn-warning" style="display:none; width:auto;" onclick="hideLoading()">⚠️ រំលង (ចូលប្រើប្រាស់ដោយគ្មាន Internet)</button>
+</div>
+
+<!-- Navigation Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">🏫</div>
+        <h2>ប្រព័ន្ធគ្រប់គ្រងសាលា</h2>
+    </div>
+    
+    <div class="sidebar-category">វត្តមានសិស្ស</div>
+    <button class="nav-btn active" onclick="switchTab('tab-daily', this)">📝 បញ្ចូលវត្តមាន</button>
+    <button class="nav-btn" onclick="switchTab('tab-monthly', this)">📊 បញ្ជីប្រចាំខែ</button>
+    <button class="nav-btn" onclick="switchTab('tab-search', this)">🔍 ស្វែងរកវត្តមាន</button>
+    <button class="nav-btn" id="btn-nav-students-manage" onclick="switchTab('tab-students-manage', this)">⚙️ គ្រប់គ្រងបញ្ជីឈ្មោះ</button>
+
+    <div class="sidebar-category">បន្ទុកថ្នាក់</div>
+    <button class="nav-btn" onclick="switchTab('tab-contacts', this)">🎓 ទំនាក់ទំនងអាណាព្យាបាល</button>
+    <button class="nav-btn" id="btn-nav-homeroom" onclick="switchTab('tab-homeroom', this)">👨‍🏫 គ្រូបន្ទុកថ្នាក់</button>
+    <button class="nav-btn" onclick="switchTab('tab-subject-teachers', this)">📚 គ្រូបង្រៀន</button>
+    <button class="nav-btn" onclick="switchTab('tab-timetable', this)">📅 កាលវិភាគ</button>
+
+    <div class="sidebar-category">ប្រព័ន្ធបន្ថែម</div>
+    <button class="nav-btn" id="btn-nav-conduct-eval" onclick="switchTab('tab-conduct-eval', this)">🌟 វាយតម្លៃឥរិយាបថ/សមត្ថភាព</button>
+
+    <button class="nav-btn admin-only" id="btn-nav-data-entry" onclick="switchTab('tab-data-entry', this)">📝 បំពេញទិន្នន័យ</button>
+</div>
+
+<!-- Main Content Area -->
+<div class="main-content">
+    <div id="statusContainer"></div>
+
+    <!-- TAB 1: DAILY ENTRY -->
+    <div id="tab-daily" class="section active">
+        <div class="section-header"><h3 class="section-title">បញ្ចូលវត្តមានសិស្សប្រចាំថ្ងៃ</h3></div>
+        <div class="control-panel">
+            <div class="form-group">
+                <label>មុខវិជ្ជា៖</label>
+                <select id="daily-subject" onchange="loadDailyData()">
+                    <option value="អង់គ្លេស">ភាសាអង់គ្លេស</option>
+                    <option value="ខ្មែរ">អក្សរសាស្ត្រខ្មែរ</option>
+                    <option value="គណិត">គណិតវិទ្យា</option>
+                    <option value="រូបវិទ្យា">រូបវិទ្យា</option>
+                    <option value="គីមីវិទ្យា">គីមីវិទ្យា</option>
+                    <option value="ជីវវិទ្យា">ជីវវិទ្យា</option>
+                    <option value="ផែនដីវិទ្យា">ផែនដីវិទ្យា</option>
+                    <option value="ប្រវត្តិវិទ្យា">ប្រវត្តិវិទ្យា</option>
+                    <option value="ពលរដ្ឋ">ពលរដ្ឋវិទ្យា</option>
+                    <option value="ភូមិវិទ្យា">ភូមិវិទ្យា</option>
+                    <option value="ព័ត៌មានវិទ្យា">ព័ត៌មានវិទ្យា (ICT)</option>
+                    <option value="អប់រំកាយ">អប់រំកាយ និងកីឡា</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ថ្នាក់៖</label>
+                <select id="daily-class" onchange="loadDailyData()">
+                    <option value="7A">ថ្នាក់ 7A</option><option value="7B">ថ្នាក់ 7B</option>
+                    <option value="8A">ថ្នាក់ 8A</option><option value="8B">ថ្នាក់ 8B</option>
+                    <option value="9A">ថ្នាក់ 9A</option><option value="9B">ថ្នាក់ 9B</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ថ្ងៃទី៖</label>
+                <input type="date" id="daily-date" onchange="loadDailyData()">
+            </div>
+            <button class="btn-action" onclick="saveDailyAttendance()">💾 រក្សាទុកវត្តមាន</button>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">ល.រ</th>
+                        <th class="col-id" style="width: 12%;">ID សិស្ស</th>
+                        <th style="width: 45%;">គោត្តនាម និង នាម</th>
+                        <th style="width: 10%;">ភេទ</th>
+                        <th style="width: 25%;">វត្តមាន</th>
+                    </tr>
+                </thead>
+                <tbody id="daily-list-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB 2: MONTHLY SUMMARY -->
+    <div id="tab-monthly" class="section">
+        <div class="section-header"><h3 class="section-title" id="monthly-title">បញ្ជីវត្តមានសិស្សប្រចាំខែ</h3></div>
+        <div class="control-panel">
+            <div class="form-group">
+                <label>មុខវិជ្ជា៖</label>
+                <select id="monthly-subject" onchange="renderMonthlySheet()">
+                    <option value="អង់គ្លេស">ភាសាអង់គ្លេស</option>
+                    <option value="ខ្មែរ">អក្សរសាស្ត្រខ្មែរ</option>
+                    <option value="គណិត">គណិតវិទ្យា</option>
+                    <option value="រូបវិទ្យា">រូបវិទ្យា</option>
+                    <option value="គីមីវិទ្យា">គីមីវិទ្យា</option>
+                    <option value="ជីវវិទ្យា">ជីវវិទ្យា</option>
+                    <option value="ផែនដីវិទ្យា">ផែនដីវិទ្យា</option>
+                    <option value="ប្រវត្តិវិទ្យា">ប្រវត្តិវិទ្យា</option>
+                    <option value="ពលរដ្ឋ">ពលរដ្ឋវិទ្យា</option>
+                    <option value="ភូមិវិទ្យា">ភូមិវិទ្យា</option>
+                    <option value="ព័ត៌មានវិទ្យា">ព័ត៌មានវិទ្យា (ICT)</option>
+                    <option value="អប់រំកាយ">អប់រំកាយ និងកីឡា</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ថ្នាក់៖</label>
+                <select id="monthly-class" onchange="renderMonthlySheet()">
+                    <option value="7A" selected>ថ្នាក់ 7A</option><option value="7B">ថ្នាក់ 7B</option>
+                    <option value="8A">ថ្នាក់ 8A</option><option value="8B">ថ្នាក់ 8B</option>
+                    <option value="9A">ថ្នាក់ 9A</option><option value="9B">ថ្នាក់ 9B</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ខែ/ឆ្នាំ៖</label>
+                <input type="month" id="monthly-select" onchange="renderMonthlySheet()">
+            </div>
+            <button class="btn-action" onclick="window.print()">🖨️ បោះពុម្ព / PDF</button>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr id="monthly-header-days">
+                        <th rowspan="2" style="width: 30px;">ល.រ</th><th rowspan="2" style="min-width: 130px;">គោត្តនាម និង នាម</th><th rowspan="2" style="width: 35px;">ភេទ</th>
+                    </tr>
+                    <tr id="monthly-header-weekdays"></tr>
+                </thead>
+                <tbody id="monthly-list-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB 3: SEARCH -->
+    <div id="tab-search" class="section">
+        <div class="section-header"><h3 class="section-title">🔍 ស្វែងរក និងតាមដានវត្តមានសិស្ស</h3></div>
+        
+        <div class="search-card">
+            <h3>១. តាមដានថ្ងៃឈប់របស់សិស្សម្នាក់ៗ</h3>
+            <div class="control-panel" style="margin-top:10px;">
+                <div class="form-group">
+                    <label>មុខវិជ្ជា៖</label>
+                    <select id="search-student-subject">
+                        <option value="អង់គ្លេស">ភាសាអង់គ្លេស</option>
+                        <option value="ខ្មែរ">អក្សរសាស្ត្រខ្មែរ</option>
+                        <option value="គណិត">គណិតវិទ្យា</option>
+                        <option value="រូបវិទ្យា">រូបវិទ្យា</option>
+                        <option value="គីមីវិទ្យា">គីមីវិទ្យា</option>
+                        <option value="ជីវវិទ្យា">ជីវវិទ្យា</option>
+                        <option value="ផែនដីវិទ្យា">ផែនដីវិទ្យា</option>
+                        <option value="ប្រវត្តិវិទ្យា">ប្រវត្តិវិទ្យា</option>
+                        <option value="ពលរដ្ឋ">ពលរដ្ឋវិទ្យា</option>
+                        <option value="ភូមិវិទ្យា">ភូមិវិទ្យា</option>
+                        <option value="ព័ត៌មានវិទ្យា">ព័ត៌មានវិទ្យា (ICT)</option>
+                        <option value="អប់រំកាយ">អប់រំកាយ និងកីឡា</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ថ្នាក់៖</label>
+                    <select id="search-student-class" onchange="populateStudentSelect()">
+                        <option value="7A" selected>ថ្នាក់ 7A</option><option value="7B">ថ្នាក់ 7B</option>
+                        <option value="8A">ថ្នាក់ 8A</option><option value="8B">ថ្នាក់ 8B</option>
+                        <option value="9A">ថ្នាក់ 9A</option><option value="9B">ថ្នាក់ 9B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>សិស្ស៖</label>
+                    <select id="search-student-id"></select>
+                </div>
+                <button class="btn-action" onclick="searchByStudent()">🔎 ស្វែងរកសិស្ស</button>
+            </div>
+            <div id="student-absence-result" class="table-responsive" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="search-card">
+            <h3>២. រកសិស្សដែលបានអវត្តមានប្រចាំថ្ងៃ</h3>
+            <div class="control-panel" style="margin-top:10px;">
+                <div class="form-group">
+                    <label>មុខវិជ្ជា៖</label>
+                    <select id="search-date-subject">
+                        <option value="អង់គ្លេស">ភាសាអង់គ្លេស</option>
+                        <option value="ខ្មែរ">អក្សរសាស្ត្រខ្មែរ</option>
+                        <option value="គណិត">គណិតវិទ្យា</option>
+                        <option value="រូបវិទ្យា">រូបវិទ្យា</option>
+                        <option value="គីមីវិទ្យា">គីមីវិទ្យា</option>
+                        <option value="ជីវវិទ្យា">ជីវវិទ្យា</option>
+                        <option value="ផែនដីវិទ្យា">ផែនដីវិទ្យា</option>
+                        <option value="ប្រវត្តិវិទ្យា">ប្រវត្តិវិទ្យា</option>
+                        <option value="ពលរដ្ឋ">ពលរដ្ឋវិទ្យា</option>
+                        <option value="ភូមិវិទ្យា">ភូមិវិទ្យា</option>
+                        <option value="ព័ត៌មានវិទ្យា">ព័ត៌មានវិទ្យា (ICT)</option>
+                        <option value="អប់រំកាយ">អប់រំកាយ និងកីឡា</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ថ្នាក់៖</label>
+                    <select id="search-date-class">
+                        <option value="7A" selected>ថ្នាក់ 7A</option><option value="7B">ថ្នាក់ 7B</option>
+                        <option value="8A">ថ្នាក់ 8A</option><option value="8B">ថ្នាក់ 8B</option>
+                        <option value="9A">ថ្នាក់ 9A</option><option value="9B">ថ្នាក់ 9B</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ថ្ងៃខែឆ្នាំ៖</label>
+                    <input type="date" id="search-single-date">
+                </div>
+
+                <button class="btn-action" onclick="searchTodayAbsence()">🔎 ស្វែងរក</button>
+                <button class="btn-action btn-danger" onclick="exportAbsentToPDF()">📥 ទាញយកជា PDF</button>
+            </div>
+            <div id="date-absence-result" class="table-responsive" style="margin-top:10px;"></div>
+        </div>
+    </div>
+
+    <!-- TAB 4: STUDENTS MANAGEMENT -->
+    <div id="tab-students-manage" class="section">
+        <div class="section-header">
+            <h3 class="section-title" onclick="toggleAdminMode()" style="cursor: pointer; user-select: none;">
+                ⚙️ គ្រប់គ្រងបញ្ជីឈ្មោះសិស្ស <span id="admin-indicator" style="font-size: 11px; color: #16a34a; display: none;">(Admin Mode)</span>
+            </h3>
+        </div>
+        
+        <div class="control-panel">
+            <div class="form-group">
+                <label>ថ្នាក់៖</label>
+                <select id="manage-class-select" onchange="renderStudentManagement()">
+                    <option value="7A">ថ្នាក់ 7A</option><option value="7B">ថ្នាក់ 7B</option>
+                    <option value="8A">ថ្នាក់ 8A</option><option value="8B">ថ្នាក់ 8B</option>
+                    <option value="9A">ថ្នាក់ 9A</option><option value="9B">ថ្នាក់ 9B</option>
+                </select>
+            </div>
+            <div class="form-group col-id">
+                <label>ID សិស្ស (ស្វ័យប្រវត្តិ/កំណត់ផ្ទាល់)៖</label>
+                <input type="text" id="student-custom-id" placeholder="ឧ. 7A-01">
+            </div>
+            <div class="form-group">
+                <label>ឈ្មោះសិស្ស៖</label>
+                <input type="text" id="student-name" placeholder="ឧ. សុខ ម៉េងហុង">
+            </div>
+            <div class="form-group">
+                <label>ភេទ៖</label>
+                <select id="student-gender"><option value="ប្រុស">ប្រុស</option><option value="ស្រី">ស្រី</option></select>
+            </div>
+            <button class="btn-action" onclick="saveStudent()">➕ បន្ថែមសិស្ស</button>
+        </div>
+
+        <div id="admin-csv-panel" class="search-card admin-only" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+            <h3 style="color: #166534; margin-bottom: 8px;">📂 នាំចេញ (Export) & នាំចូល (Import) សិស្ស</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-action btn-purple" style="flex:1;" onclick="exportStudentsToCSV()">📤 នាំចេញបញ្ជីឈ្មោះសិស្ស</button>
+                    <button class="btn-action btn-success" style="flex:1;" onclick="importStudentsFromCSV()">📥 នាំចូលបញ្ជីឈ្មោះសិស្ស</button>
+                </div>
+                <div class="form-group" style="margin-top:10px;">
+                    <label style="color:#15803d;">សូមជ្រើសរើសបញ្ជីឈ្មោះសិស្ស៖</label>
+                    <input type="file" id="import-csv-file" accept=".csv">
+                </div>
+            </div>
+        </div>
+
+        <div class="search-card">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="form-group">
+                    <label>🔍 ស្វែងរកឈ្មោះសិស្ស៖</label>
+                    <input type="text" id="search-student-keyword" placeholder="វាយបញ្ចូលឈ្មោះសិស្ស..." oninput="renderStudentManagement()">
+                </div>
+                <div class="form-group">
+                    <label>តម្រងស្ថានភាព៖</label>
+                    <select id="filter-status-select" onchange="renderStudentManagement()">
+                        <option value="all">បង្ហាញទាំងអស់</option>
+                        <option value="active" selected>កំពុងរៀន</option>
+                        <option value="dropped">បោះបង់ការសិក្សា</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">ល.រ</th>
+                        <th class="col-id" style="width: 15%;">ID សិស្ស</th>
+                        <th style="width: 35%;">គោត្តនាម និង នាម</th>
+                        <th style="width: 10%;">ភេទ</th>
+                        <th style="width: 15%;">ស្ថានភាព</th>
+                        <th style="width: 17%;">សកម្មភាព</th>
+                    </tr>
+                </thead>
+                <tbody id="manage-student-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB 5: CONTACTS -->
+    <div id="tab-contacts" class="section">
+        <div class="section-header">
+            <h3 class="section-title">លេខទំនាក់ទំនងអាណាព្យាបាលសិស្ស</h3>
+            <div class="select-wrapper-group">
+                <select id="studentSelect" class="select-box" onchange="renderStudents()">
+                    <option value="ALL">-- បង្ហាញសិស្សទាំងអស់ --</option>
+                </select>
+            </div>
+        </div>
+        <div id="studentsContainer">កំពុងទាញទិន្នន័យ...</div>
+    </div>
+
+    <!-- TAB 6: HOMEROOM TEACHER -->
+    <div id="tab-homeroom" class="section">
+        <div class="section-header"><h3 class="section-title">ព័ត៌មានគ្រូបន្ទុកថ្នាក់</h3></div>
+        <div id="homeroomContainer" class="card-grid"></div>
+    </div>
+
+    <!-- TAB 7: SUBJECT TEACHERS -->
+    <div id="tab-subject-teachers" class="section">
+        <div class="section-header">
+            <h3 class="section-title">ទំនាក់ទំនងគ្រូបង្រៀនតាមមុខវិជ្ជា</h3>
+            <div class="select-wrapper-group">
+                <select id="subjectTeacherClassFilter" class="select-box" onchange="renderSubjectTeachers()">
+                    <option value="ALL">-- បង្ហាញគ្រប់ថ្នាក់ --</option>
+                    <option value="7A">ថ្នាក់ 7A</option>
+                    <option value="7B">ថ្នាក់ 7B</option>
+                    <option value="8A">ថ្នាក់ 8A</option>
+                    <option value="8B">ថ្នាក់ 8B</option>
+                    <option value="9A">ថ្នាក់ 9A</option>
+                    <option value="9B">ថ្នាក់ 9B</option>
+                </select>
+            </div>
+        </div>
+        <div id="subjectTeachersContainer" class="card-grid"></div>
+    </div>
+
+    <!-- TAB 8: TIMETABLE -->
+    <div id="tab-timetable" class="section">
+        <div class="section-header">
+            <h3 class="section-title">កាលវិភាគសិក្សាប្រចាំសប្ដាហ៍</h3>
+            <div class="select-wrapper-group">
+                <select id="timetable-class" class="select-box" onchange="renderTimetable()">
+                    <option value="7A">ថ្នាក់ 7A</option>
+                    <option value="7B">ថ្នាក់ 7B</option>
+                    <option value="8A">ថ្នាក់ 8A</option>
+                    <option value="8B">ថ្នាក់ 8B</option>
+                    <option value="9A">ថ្នាក់ 9A</option>
+                    <option value="9B">ថ្នាក់ 9B</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="schedule-nav-header">
+            <button class="day-nav-btn" onclick="changeTimetableDay(-1)"><i class="fas fa-chevron-left"></i></button>
+            <div style="font-size: 1rem; font-weight: bold; color: var(--primary);" id="displayScheduleDay">កាលវិភាគ៖ ថ្ងៃច័ន្ទ</div>
+            <button class="day-nav-btn" onclick="changeTimetableDay(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr><th>ម៉ោង</th><th>មុខវិជ្ជា</th><th>គ្រូបង្រៀន</th></tr>
+                </thead>
+                <tbody id="timetableTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB: EMBEDDED SYSTEM — ប្រព័ន្ធវាយតម្លៃបំណិននិងចរិយាសម្បទា-->
+    <div id="tab-conduct-eval" class="section">
+        <iframe
+            id="conduct-eval-frame"
+            src="https://script.google.com/macros/s/AKfycbyd542iVn3f32l5A-3mRDILqD9jBVzRuHbBSLXn_QziKxYF_SzVOWNzGdvMJI_0NGwS8A/exec"
+            style="width:100%; height:100%; border:none; border-radius:var(--radius);"
+            loading="lazy">
+        </iframe>
+    </div>
+
+    <!-- TAB 9: ADMIN DATA ENTRY -->
+    <div id="tab-data-entry" class="section">
+        <div class="section-header">
+            <h3 class="section-title">📝 បំពេញទិន្នន័យសាលា (Admin)</h3>
+        </div>
+
+        <div class="control-panel">
+            <div class="form-group">
+                <label>ជ្រើសរើសថ្នាក់៖</label>
+                <select id="data-entry-class" onchange="loadDataEntryForms()">
+                    <option value="7A">ថ្នាក់ 7A</option>
+                    <option value="7B">ថ្នាក់ 7B</option>
+                    <option value="8A">ថ្នាក់ 8A</option>
+                    <option value="8B">ថ្នាក់ 8B</option>
+                    <option value="9A">ថ្នាក់ 9A</option>
+                    <option value="9B">ថ្នាក់ 9B</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 1. Homeroom Teacher -->
+        <div class="search-card" style="margin-bottom:1.25rem;">
+            <h3 style="margin-bottom:12px;">👨‍🏫 ព័ត៌មានគ្រូបន្ទុកថ្នាក់</h3>
+
+            <!-- View mode: current data -->
+            <div id="homeroom-view" style="margin-bottom:12px;">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ល.រ</th>
+                                <th>ឈ្មោះគ្រូ</th>
+                                <th>លេខទូរសព្ទ</th>
+                                <th>Telegram</th>
+                                <th>មុខវិជ្ជា</th>
+                                <th>សកម្មភាព</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td class="text-left"><strong id="hr-view-name">—</strong></td>
+                                <td id="hr-view-phone">—</td>
+                                <td id="hr-view-telegram">—</td>
+                                <td id="hr-view-subject">—</td>
+                                <td>
+                                    <button type="button" class="btn-action btn-warning" style="padding:4px 8px;font-size:11px;width:auto;" onclick="enableHomeroomEdit()">កែ</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Edit mode: form (hidden by default) -->
+            <div id="homeroom-edit" style="display:none;">
+                <div class="control-panel" style="margin-bottom:0;">
+                    <div class="form-group">
+                        <label>ឈ្មោះគ្រូ៖</label>
+                        <select id="de-homeroom-name" onchange="onHomeroomTeacherChange()">
+                            <option value="">-- ជ្រើសរើសគ្រូ --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>លេខទូរសព្ទ៖</label>
+                        <input type="text" id="de-homeroom-phone" placeholder="ឧ. 012 00 00 00">
+                    </div>
+                    <div class="form-group">
+                        <label>Telegram៖</label>
+                        <input type="text" id="de-homeroom-telegram" placeholder="@username">
+                    </div>
+                    <div class="form-group">
+                        <label>មុខវិជ្ជាបង្រៀន៖</label>
+                        <select id="de-homeroom-subject">
+                            <option value="">-- ជ្រើសរើសមុខវិជ្ជា --</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn-action" style="flex:1;" onclick="saveHomeroomData()">💾 រក្សាទុក</button>
+                        <button type="button" class="btn-action btn-danger" style="flex:1;" onclick="cancelHomeroomEdit()">បោះបង់</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1b. Master Teachers (Firebase + Sheet Teachers) -->
+        <div class="search-card" style="margin-bottom:1.25rem;">
+            <h3 style="margin-bottom:12px;">👥 បញ្ជីគ្រូ (Teachers)</h3>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">បញ្ចូលគ្រូថ្មីទៅ Firebase និង Sheet Teachers — បន្ទាប់មកជ្រើសឈ្មោះពី dropdown នៅខាងក្រោម</p>
+            <div class="control-panel">
+                <div class="form-group">
+                    <label>ឈ្មោះគ្រូ៖</label>
+                    <input type="text" id="de-teacher-name" placeholder="ឧ. លោកគ្រូ សួ ឡុងហាក់">
+                </div>
+                <div class="form-group">
+                    <label>លេខទូរសព្ទ៖</label>
+                    <input type="text" id="de-teacher-phone" placeholder="ឧ. 011 29 31 28">
+                </div>
+                <div class="form-group">
+                    <label>Telegram៖</label>
+                    <input type="text" id="de-teacher-telegram" placeholder="@username">
+                </div>
+                <button class="btn-action btn-success" onclick="addMasterTeacher()">➕ បន្ថែមគ្រូទៅបញ្ជី</button>
+            </div>
+            <div class="table-responsive" style="margin-top:12px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ល.រ</th>
+                            <th>ឈ្មោះគ្រូ</th>
+                            <th>លេខទូរសព្ទ</th>
+                            <th>Telegram</th>
+                            <th>សកម្មភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="de-teachers-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. Subject Teachers -->
+        <div class="search-card" style="margin-bottom:1.25rem;">
+            <h3 style="margin-bottom:12px;">📚 គ្រូមុខវិជ្ជា (តាមថ្នាក់)</h3>
+            <div class="control-panel">
+                <div class="form-group">
+                    <label>ឈ្មោះគ្រូ៖</label>
+                    <select id="de-subject-name" onchange="onSubjectTeacherNameChange()">
+                        <option value="">-- ជ្រើសរើសគ្រូ --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>មុខវិជ្ជា៖</label>
+                    <select id="de-subject-subject">
+                        <option value="">-- ជ្រើសរើសមុខវិជ្ជា --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>លេខទូរសព្ទ៖</label>
+                    <input type="text" id="de-subject-phone" placeholder="ឧ. 012 34 56 78">
+                </div>
+                <div class="form-group">
+                    <label>Telegram៖</label>
+                    <input type="text" id="de-subject-telegram" placeholder="@username">
+                </div>
+                <button class="btn-action btn-success" onclick="addSubjectTeacher()">➕ បន្ថែមគ្រូមុខវិជ្ជា</button>
+            </div>
+            <div class="table-responsive" style="margin-top:12px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ល.រ</th>
+                            <th>ឈ្មោះគ្រូ</th>
+                            <th>មុខវិជ្ជា</th>
+                            <th>លេខទូរសព្ទ</th>
+                            <th>Telegram</th>
+                            <th>សកម្មភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="de-subject-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. Timetable -->
+        <div class="search-card" style="margin-bottom:1.25rem;">
+            <h3 style="margin-bottom:12px;">📅 កាលវិភាគ (តាមថ្នាក់ + ថ្ងៃ)</h3>
+            <div class="control-panel">
+                <div class="form-group">
+                    <label>ថ្ងៃ៖</label>
+                    <select id="de-timetable-day">
+                        <option value="ច័ន្ទ">ច័ន្ទ</option>
+                        <option value="អង្គារ">អង្គារ</option>
+                        <option value="ពុធ">ពុធ</option>
+                        <option value="ព្រហស្បតិ៍">ព្រហស្បតិ៍</option>
+                        <option value="សុក្រ">សុក្រ</option>
+                        <option value="សៅរ៍">សៅរ៍</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ម៉ោង៖</label>
+                    <input type="text" id="de-timetable-time" placeholder="ឧ. 07:00-08:00">
+                </div>
+                <div class="form-group">
+                    <label>មុខវិជ្ជា៖</label>
+                    <select id="de-timetable-subject">
+                        <option value="">-- ជ្រើសរើសមុខវិជ្ជា --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>គ្រូបង្រៀន៖</label>
+                    <select id="de-timetable-teacher">
+                        <option value="">-- ជ្រើសរើសគ្រូ --</option>
+                    </select>
+                </div>
+                <button class="btn-action btn-success" onclick="addTimetableSlot()">➕ បន្ថែមម៉ោង</button>
+            </div>
+            <div class="table-responsive" style="margin-top:12px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ថ្នាក់</th>
+                            <th>ថ្ងៃ</th>
+                            <th>ម៉ោង</th>
+                            <th>មុខវិជ្ជា</th>
+                            <th>គ្រូបង្រៀន</th>
+                            <th>សកម្មភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="de-timetable-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. Student Management (Admin) -->
+        <div class="search-card" style="margin-bottom:1.25rem;">
+            <h3 style="margin-bottom:12px;">⚙️ គ្រប់គ្រងបញ្ជីឈ្មោះសិស្ស</h3>
+            <div class="control-panel">
+                <div class="form-group">
+                    <label>ID សិស្ស (ស្វ័យប្រវត្តិ/កំណត់ផ្ទាល់)៖</label>
+                    <input type="text" id="de-student-custom-id" placeholder="ឧ. 7A-01">
+                </div>
+                <div class="form-group">
+                    <label>ឈ្មោះសិស្ស៖</label>
+                    <input type="text" id="de-student-name" placeholder="ឧ. សុខ ម៉េងហុង">
+                </div>
+                <div class="form-group">
+                    <label>ភេទ៖</label>
+                    <select id="de-student-gender"><option value="ប្រុស">ប្រុស</option><option value="ស្រី">ស្រី</option></select>
+                </div>
+                <button class="btn-action" onclick="saveStudentFromDataEntry()">➕ បន្ថែមសិស្ស</button>
+            </div>
+
+            <div class="control-panel" style="margin-top:10px;">
+                <div class="form-group">
+                    <label>🔍 ស្វែងរកឈ្មោះសិស្ស៖</label>
+                    <input type="text" id="de-search-student-keyword" placeholder="វាយបញ្ចូលឈ្មោះសិស្ស..." oninput="renderDataEntryStudents()">
+                </div>
+                <div class="form-group">
+                    <label>តម្រងស្ថានភាព៖</label>
+                    <select id="de-filter-status-select" onchange="renderDataEntryStudents()">
+                        <option value="all">បង្ហាញទាំងអស់</option>
+                        <option value="active" selected>កំពុងរៀន</option>
+                        <option value="dropped">បោះបង់ការសិក្សា</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="de-admin-csv-panel" style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px; padding:1rem; margin:12px 0;">
+                <h4 style="color:#166534; margin-bottom:8px;">📂 នាំចេញ / នាំចូល បញ្ជីឈ្មោះសិស្ស</h4>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                    <button class="btn-action btn-purple" style="flex:1;" onclick="exportStudentsToCSVFromDataEntry()">📤 នាំចេញបញ្ជីឈ្មោះសិស្ស</button>
+                    <button class="btn-action btn-success" style="flex:1;" onclick="importStudentsFromCSVFromDataEntry()">📥 នាំចូលបញ្ជីឈ្មោះសិស្ស</button>
+                </div>
+                <div class="form-group">
+                    <label style="color:#15803d;">សូមជ្រើសរើសបញ្ជីឈ្មោះសិស្ស៖</label>
+                    <input type="file" id="de-import-csv-file" accept=".csv">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:8%;">ល.រ</th>
+                            <th class="col-id" style="width:15%;">ID សិស្ស</th>
+                            <th style="width:35%;">គោត្តនាម និង នាម</th>
+                            <th style="width:10%;">ភេទ</th>
+                            <th style="width:15%;">ស្ថានភាព</th>
+                            <th style="width:17%;">សកម្មភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="de-manage-student-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+// ==================== HELPER FUNCTIONS (បន្ថែមថ្មី) ====================
+function getStudentClass(s) {
+    if (!s) return '';
+    // គាំទ្រទាំង Firebase (className/class) និង Google Sheets (ថ្នាក់)
+    let raw = (s.className || s.class || s['ថ្នាក់'] || s['ថ្នាក់ទី'] || s.ClassID || s['ClassID'] || '').toString().trim();
+    // Normalize: "ថ្នាក់ 7A" / "ថ្នាក់7A" / "Class 7A" -> "7A"
+    const m = raw.match(/([7-9][AB])/i);
+    if (m) return m[1].toUpperCase();
+    return raw;
+}
+
+function getStudentName(s) {
+    if (!s) return '';
+    return (s.name || s['ឈ្មោះសិស្ស'] || s['ឈ្មោះ'] || '').toString().trim();
+}
+
+function getStudentGender(s) {
+    if (!s) return '';
+    return (s.gender || s['ភេទ'] || '').toString().trim();
+}
+
+function isStudentActive(s) {
+    const status = (s.status || 'active').toString().toLowerCase();
+    return status !== 'dropped';
+}
+
+// បង្កើតបញ្ជីសិស្សរួម (Firebase ជាអាទិភាព + fallback Sheets)
+function getUnifiedStudents() {
+    let list = [];
+
+    // 1. ពី Firebase
+    if (students && students.length > 0) {
+        list = students.map(s => {
+            const cls = getStudentClass(s);
+            return {
+                id: String(s.id || ''),
+                name: getStudentName(s),
+                gender: getStudentGender(s),
+                className: cls,
+                class: cls,
+                status: s.status || 'active',
+                phone: s.phone || s.studentPhone || s.StudentPhone || s['លេខទូរសព្ទ'] || '',
+                guardianName: s.guardianName || s.GuardianName || s['ឈ្មោះអាណាព្យាបាល'] || '',
+                guardianPhone: s.guardianPhone || s.GuardianPhone || s['លេខទូរសព្ទអាណាព្យាបាល'] || '',
+                guardianRelation: s.guardianRelation || s['ត្រូវជា'] || '',
+                source: 'firebase'
+            };
+        }).filter(s => s.name); // skip empty names
+    }
+
+    // 2. បន្ថែមពី Google Sheets ប្រសិនបើមិនទាន់មានក្នុង Firebase (តាមឈ្មោះ + ថ្នាក់)
+    if (globalData.students && globalData.students.length > 0) {
+        globalData.students.forEach(gs => {
+            const gName = getStudentName(gs);
+            const gClass = getStudentClass(gs);
+            if (!gName) return;
+
+            const gId = (gs.StudentID || gs['StudentID'] || gs.id || '').toString().trim();
+            const exists = list.some(s => 
+                (gId && String(s.id) === gId) ||
+                (s.name === gName && getStudentClass(s) === getStudentClass({ class: gClass }))
+            );
+
+            if (!exists) {
+                const tempId = gId || `${gClass}-${gName}`;
+                const normalizedClass = getStudentClass({ class: gClass }) || gClass;
+                list.push({
+                    id: tempId,
+                    name: gName,
+                    gender: getStudentGender(gs),
+                    className: normalizedClass,
+                    class: normalizedClass,
+                    status: 'active',
+                    phone: gs['លេខទូរសព្ទ'] || gs.StudentPhone || gs['លេខទូរសព្ទសិស្ស'] || '',
+                    guardianName: gs.GuardianName || gs['ឈ្មោះអាណាព្យាបាល'] || '',
+                    guardianPhone: gs.GuardianPhone || gs['លេខទូរសព្ទអាណាព្យាបាល'] || '',
+                    guardianRelation: gs['ត្រូវជា'] || '',
+                    source: 'sheets'
+                });
+            }
+        });
+    }
+
+    // Sort ឈ្មោះខ្មែរ
+    list.sort((a, b) => a.name.localeCompare(b.name, 'km'));
+    return list;
+}
+
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "",
+      authDomain: "",
+      databaseURL: "",
+      projectId: "",
+    };
+
+    let db = null;
+    let isFirebaseConnected = false;
+
+    try {
+        if (typeof firebase !== 'undefined') {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        }
+    } catch (e) {
+        console.error("Firebase Config Error: ", e);
+    }
+
+    const khmerDays = ["អាទិត្យ", "ច័ន្ទ", "អង្គារ", "ពុធ", "ព្រហស្បតិ៍", "សុក្រ", "សៅរ៍"];
+    const khmerMonths = ["មករា", "កុម្ភៈ", "មីនា", "មេសា", "ឧសភា", "មិថុនា", "កក្កដា", "សីហា", "កញ្ញា", "តុលា", "វិច្ឆិកា", "ធ្នូ"];
+
+    let currentDayIndex = new Date().getDay();
+
+    let students = [];
+    let attendanceData = {};
+    let globalData = {}; 
+
+    let clickCount = 0;
+    let clickTimer = null;
+    let isAdmin = false;
+
+    // Global variables សម្រាប់រក្សាទុក Role និង Class របស់ User Current
+    let userRole = 'admin';
+    let assignedClass = '7A';
+
+    // អនុមុខងារសម្រាប់កំណត់សិទ្ធិលើ Dropdown ថ្នាក់រៀន និងលាក់/បង្ហាញ Tab គ្រូបន្ទុកថ្នាក់
+    function applyRolePermissions(role, teacherClass) {
+        userRole = role;
+        if (teacherClass) assignedClass = teacherClass;
+
+        const classDropdowns = [
+            document.getElementById('daily-class'),
+            document.getElementById('monthly-class'),
+            document.getElementById('search-student-class'),
+            document.getElementById('search-date-class'),
+            document.getElementById('manage-class-select'),
+            document.getElementById('subjectTeacherClassFilter'),
+            document.getElementById('data-entry-class'),
+            document.getElementById('timetable-class')
+        ];
+
+        const homeroomNavBtn = document.getElementById('btn-nav-homeroom');
+        const studentsManageNavBtn = document.getElementById('btn-nav-students-manage');
+        const dataEntryNavBtn = document.getElementById('btn-nav-data-entry');
+        const dataEntryCat = document.getElementById('admin-data-category');
+
+        if (role === 'teacher') {
+            classDropdowns.forEach(dropdown => {
+                if (dropdown) {
+                    dropdown.value = assignedClass;
+                    dropdown.disabled = true;
+                }
+            });
+            
+            if (homeroomNavBtn) homeroomNavBtn.style.display = 'none';
+            // Teacher: show student management, hide admin data entry
+            if (studentsManageNavBtn) studentsManageNavBtn.style.display = 'flex';
+            if (dataEntryNavBtn) dataEntryNavBtn.style.display = 'none';
+            if (dataEntryCat) dataEntryCat.style.display = 'none';
+        } else if (role === 'admin') {
+            classDropdowns.forEach(dropdown => {
+                if (dropdown) dropdown.disabled = false;
+            });
+            if (homeroomNavBtn) homeroomNavBtn.style.display = 'flex';
+            // Admin: hide separate student management, show data entry (which includes students)
+            if (studentsManageNavBtn) studentsManageNavBtn.style.display = 'none';
+            if (dataEntryNavBtn) dataEntryNavBtn.style.display = 'flex';
+            if (dataEntryCat) dataEntryCat.style.display = 'block';
+        } else {
+            // Director or other
+            classDropdowns.forEach(dropdown => {
+                if (dropdown) dropdown.disabled = false;
+            });
+            if (homeroomNavBtn) homeroomNavBtn.style.display = 'flex';
+            if (studentsManageNavBtn) studentsManageNavBtn.style.display = 'flex';
+            if (dataEntryNavBtn) dataEntryNavBtn.style.display = 'none';
+            if (dataEntryCat) dataEntryCat.style.display = 'none';
+        }
+    }
+
+    // --- LOGIN SYSTEM FUNCTIONS ---
+    function toggleTeacherClassInput() {
+        const roleSelect = document.getElementById('modalRole');
+        const classGroup = document.getElementById('teacherClassGroup');
+        if (roleSelect && classGroup) {
+            classGroup.style.display = (roleSelect.value === 'teacher') ? 'block' : 'none';
+        }
+    }
+
+    function handleLogin() {
+        const roleEl = document.getElementById('modalRole');
+        const pinEl = document.getElementById('modalPin');
+        const classEl = document.getElementById('modalClass');
+
+        if (!roleEl || !pinEl) return;
+
+        const role = roleEl.value;
+        const pin = pinEl.value.trim();
+        const classNum = classEl ? classEl.value.trim() : '';
+
+        if (!pin) {
+            alert("សូមបញ្ចូលលេខកូដសម្ងាត់!");
+            return;
+        }
+
+        if (role === 'teacher' && !classNum) {
+            alert("សូមជ្រើសរើសថ្នាក់ដែលទទួលបន្ទុក!");
+            return;
+        }
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(function(isValid) {
+                    if (isValid) {
+                        alert("ចូលប្រើប្រាស់ជោគជ័យ!");
+                        
+                        const modal = document.getElementById('loginModal');
+                        if (modal) modal.style.display = 'none';
+
+                        applyRolePermissions(role, classNum);
+
+                        if (role === 'admin') {
+                            if (!isAdmin) toggleAdminModeForce(true);
+                        }
+                        
+                        populateStudentDropdown();
+                        loadDailyData();
+                    } else {
+                        alert("លេខកូដសម្ងាត់មិនត្រឹមត្រូវទេ! សូមព្យាយាមម្តងទៀត។");
+                    }
+                })
+                .withFailureHandler(function(err) {
+                    alert("មានបញ្ហាក្នុងការតភ្ជាប់ទៅ Server៖ " + err.message);
+                })
+                .checkLoginCredentials(role, pin);
+        } else {
+            if (pin === "1234") {
+                alert("ចូលប្រើប្រាស់ជោគជ័យ (Offline/Local)!");
+                const modal = document.getElementById('loginModal');
+                if (modal) modal.style.display = 'none';
+
+                applyRolePermissions(role, classNum);
+
+                if (role === 'admin') toggleAdminModeForce(true);
+
+                populateStudentDropdown();
+                loadDailyData();
+            } else {
+                alert("លេខកូដសម្ងាត់មិនត្រឹមត្រូវទេ!");
+            }
+        }
+    }
+
+    function toggleAdminModeForce(enable) {
+        isAdmin = enable;
+        const adminPanel = document.getElementById('admin-csv-panel');
+        const adminIndicator = document.getElementById('admin-indicator');
+        if (adminPanel) adminPanel.style.display = isAdmin ? 'block' : 'none';
+        if (adminIndicator) adminIndicator.style.display = isAdmin ? 'inline' : 'none';
+
+        // Show/Hide Admin Data Entry nav
+        document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.display = isAdmin ? (el.tagName === 'BUTTON' || el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none';
+        });
+        const dataCat = document.getElementById('admin-data-category');
+        if (dataCat) dataCat.style.display = isAdmin ? 'block' : 'none';
+        const dataBtn = document.getElementById('btn-nav-data-entry');
+        if (dataBtn) dataBtn.style.display = (isAdmin && window.innerWidth > 900) ? 'flex' : 'none';
+    }
+
+    function toggleAdminMode() {
+        clickCount++;
+        if (clickCount === 1) {
+            clickTimer = setTimeout(() => { clickCount = 0; }, 1000);
+        } else if (clickCount === 3) {
+            clearTimeout(clickTimer);
+            clickCount = 0;
+            if (!isAdmin) {
+                const pwd = prompt("🔐 សូមបញ្ចូលលេខកូដសម្ងាត់ Admin (Password)៖");
+                if (pwd === "1234") {
+                    toggleAdminModeForce(true);
+                    alert("✅ ចូលប្រើប្រាស់ជា Admin Mode បានជោគជ័យ!");
+                } else if(pwd !== null) {
+                    alert("❌ លេខកូដសម្ងាត់មិនត្រឹមត្រូវទេ!");
+                }
+            } else {
+                toggleAdminModeForce(false);
+                alert("🔒 បានចាកចេញពី Admin Mode!");
+            }
+        }
+    }
+
+    function hideLoading() {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+
+    window.onload = function() {
+        const today = new Date();
+        const dailyDateInput = document.getElementById('daily-date');
+        const monthlySelectInput = document.getElementById('monthly-select');
+        const searchSingleDateInput = document.getElementById('search-single-date');
+
+        if (dailyDateInput) dailyDateInput.valueAsDate = today;
+        if (monthlySelectInput) monthlySelectInput.value = today.toISOString().slice(0, 7);
+        if (searchSingleDateInput) searchSingleDateInput.valueAsDate = today;
+
+        setTimeout(() => {
+            const btnSkip = document.getElementById('btn-skip');
+            if(btnSkip) btnSkip.style.display = 'inline-block';
+        }, 4000);
+
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(data => {
+                    const prevST = globalData.subjectTeachers;
+                    const prevHR = globalData.homeroom;
+                    const prevTT = globalData.timetable;
+                    const prevMT = globalData.masterTeachers;
+                    globalData = data || {};
+                    // Keep Firebase-edited lists if they exist (don't let Sheet overwrite Admin edits)
+                    if (prevST && prevST.length) globalData.subjectTeachers = prevST;
+                    // Homeroom: keep Firebase/previous if sheet empty or shorter
+                    if (prevHR && prevHR.length) {
+                        const sheetHR = globalData.homeroom || [];
+                        if (!sheetHR.length || prevHR.length >= sheetHR.length) {
+                            globalData.homeroom = prevHR;
+                        }
+                    }
+                    if (prevTT && prevTT.length) globalData.timetable = prevTT;
+                    if (prevMT && prevMT.length) globalData.masterTeachers = prevMT;
+                    populateStudentDropdown();
+                    renderStudents();
+                    renderHomeroom();
+                    renderSubjectTeachers();
+                    renderTimetable();
+                    if (typeof populateSubjectDropdowns === 'function') populateSubjectDropdowns();
+        populateTeacherNameDropdown();
+        renderMasterTeachersList();
+                })
+                .withFailureHandler(err => {
+                    const statusContainer = document.getElementById('statusContainer');
+                    if (statusContainer) {
+                        statusContainer.innerHTML = `<div class="error-msg">⚠️ មានបញ្ហាក្នុងការភ្ជាប់ទៅ Google Sheet: ${err.message}</div>`;
+                    }
+                })
+                .getData();
+        }
+
+        if(!db) {
+            const loadingText = document.getElementById('loading-text');
+            if (loadingText) {
+                loadingText.innerHTML = '❌ មិនអាចទាក់ទងបណ្ណាល័យ Firebase បានទេ!<br><small style="color:red;">សូមពិនិត្យមើលសេវា Internet របស់អ្នក ឬចុចប៊ូតុងខាងក្រោម។</small>';
+            }
+            return;
+        }
+
+        db.ref().on('value', (snapshot) => {
+            isFirebaseConnected = true;
+            const data = snapshot.val() || {};
+            
+            students = [];
+            if(data.students) {
+                Object.keys(data.students).forEach(key => {
+                    students.push(data.students[key]);
+                });
+            }
+
+            students.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'km'));
+            attendanceData = data.attendance || {};
+
+            // Merge Firebase-saved school data so Admin edits persist after reload
+            if (data.subjectTeachers) {
+                const fbList = Array.isArray(data.subjectTeachers)
+                    ? data.subjectTeachers
+                    : Object.values(data.subjectTeachers);
+                if (!globalData.subjectTeachers) globalData.subjectTeachers = [];
+                // Prefer Firebase list as source of truth for manual edits
+                globalData.subjectTeachers = fbList;
+            }
+            if (data.masterTeachers) {
+                globalData.masterTeachers = Array.isArray(data.masterTeachers)
+                    ? data.masterTeachers
+                    : Object.values(data.masterTeachers);
+            }
+            if (data.homeroom) {
+                globalData.homeroom = Array.isArray(data.homeroom) ? data.homeroom : Object.values(data.homeroom);
+            }
+            if (data.timetable) {
+                globalData.timetable = Array.isArray(data.timetable) ? data.timetable : Object.values(data.timetable);
+            }
+            
+            hideLoading();
+            populateStudentDropdown();
+            loadDailyData();
+            // Refresh open views if needed
+            if (document.getElementById('tab-data-entry')?.classList.contains('active')) {
+                loadDataEntryForms();
+            }
+            if (document.getElementById('tab-subject-teachers')?.classList.contains('active')) {
+                renderSubjectTeachers();
+            }
+            if (document.getElementById('tab-homeroom')?.classList.contains('active')) {
+                renderHomeroom();
+            }
+            if (document.getElementById('tab-timetable')?.classList.contains('active')) {
+                renderTimetable();
+            }
+        }, (error) => {
+            console.error("Firebase Listen Error:", error);
+            const loadingText = document.getElementById('loading-text');
+            if (loadingText) {
+                loadingText.innerHTML = `<span style="color:red;">❌ បរាជ័យក្នុងការតភ្ជាប់ទៅ Firebase៖</span><br>${error.message}`;
+            }
+        });
+    };
+
+    function switchTab(tabId, btn) {
+        if (tabId === 'tab-data-entry' && window.innerWidth <= 900) {
+            alert('📵 ទំព័រ "បំពេញទិន្នន័យ" អាចប្រើបានតែលើកុំព្យូទ័រប៉ុណ្ណោះ។ សូមប្រើកុំព្យូទ័រដើម្បីបំពេញទិន្នន័យ។');
+            return;
+        }
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        
+        const targetSection = document.getElementById(tabId);
+        if (targetSection) targetSection.classList.add('active');
+        if (btn) btn.classList.add('active');
+
+        if(tabId === 'tab-daily') loadDailyData();
+        else if(tabId === 'tab-monthly') renderMonthlySheet();
+        else if(tabId === 'tab-search') populateStudentSelect();
+        else if(tabId === 'tab-students-manage') renderStudentManagement();
+        else if(tabId === 'tab-contacts') { populateStudentDropdown(); renderStudents(); }
+        else if(tabId === 'tab-timetable') renderTimetable();
+        else if(tabId === 'tab-subject-teachers') renderSubjectTeachers();
+        else if(tabId === 'tab-data-entry') loadDataEntryForms();
+    }
+
+    // ----------------------------------------------------
+    // ១. កែសម្រួល loadDailyData() ដើម្បីបង្ហាញសិស្សទាំងអស់ (រួមទាំងសិស្សទី១)
+    // ----------------------------------------------------
+    function loadDailyData() {
+    const selectedSubject = document.getElementById('daily-subject').value;
+    const selectedClass = document.getElementById('daily-class').value;
+    const selectedDate = document.getElementById('daily-date').value;
+    const tbody = document.getElementById('daily-list-body');
+    tbody.innerHTML = '';
+
+    const allStudents = getUnifiedStudents();
+    const classStudents = allStudents.filter(s => 
+        getStudentClass(s) === selectedClass && isStudentActive(s)
+    );
+
+    const dayKey = `${selectedSubject}_${selectedClass}_${selectedDate}`;
+    const dayData = attendanceData[dayKey] || {};
+
+    if (classStudents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:15px; color:#64748b;">មិនទាន់មានសិស្ស (កំពុងរៀន) ក្នុងថ្នាក់ ${selectedClass} ទេ!</td></tr>`;
+        return;
+    }
+
+    classStudents.forEach((student, index) => {
+        const currentStatus = dayData[student.id] || 'P';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td class="col-id">${student.id}</td>
+            <td class="text-left">${student.name}</td>
+            <td>${student.gender}</td>
+            <td>
+                <select id="status-${student.id}" class="status-btn status-${currentStatus.toLowerCase()}">
+                    <option value="P" ${currentStatus === 'P' ? 'selected' : ''}>P (វត្តមាន)</option>
+                    <option value="L" ${currentStatus === 'L' ? 'selected' : ''}>L (ច្បាប់)</option>
+                    <option value="A" ${currentStatus === 'A' ? 'selected' : ''}>A (អវត្តមាន)</option>
+                </select>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+    function saveDailyAttendance() {
+        if(!db) return alert("❌ មិនអាចរក្សាទុកបានទេ ព្រោះមិនទាន់ភ្ជាប់ទៅ Firebase!");
+        const btnSave = document.querySelector("#tab-daily .btn-action");
+        const originalText = btnSave.innerHTML;
+
+        btnSave.innerHTML = "⏳ កំពុងបញ្ជូន...";
+        btnSave.disabled = true;
+
+        const selectedSubject = document.getElementById('daily-subject').value;
+        const selectedClass = document.getElementById('daily-class').value;
+        const selectedDate = document.getElementById('daily-date').value;
+        const dayKey = `${selectedSubject}_${selectedClass}_${selectedDate}`;
+
+        const classStudents = getUnifiedStudents().filter(s => getStudentClass(s) === selectedClass && isStudentActive(s));
+        let updateData = {};
+
+        classStudents.forEach(student => {
+            const selectEl = document.getElementById(`status-${student.id}`);
+            if(selectEl) updateData[student.id] = selectEl.value;
+        });
+
+        db.ref('attendance/' + dayKey).set(updateData, function(error) {
+            btnSave.innerHTML = originalText;
+            btnSave.disabled = false;
+            if(error) {
+                alert("❌ មានបញ្ហាក្នុងការរក្សាទុក៖ " + error.message);
+            } else {
+                alert("✅ រក្សាទុកវត្តមានបានជោគជ័យ!");
+            }
+        });
+    }
+
+    function renderMonthlySheet() {
+        const selectedSubject = document.getElementById('monthly-subject').value;
+        const selectedClass = document.getElementById('monthly-class').value;
+        const monthVal = document.getElementById('monthly-select').value;
+        if(!monthVal) return;
+        const [year, month] = monthVal.split('-').map(Number);
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        const monthlyTitle = document.getElementById('monthly-title');
+        if (monthlyTitle) {
+            monthlyTitle.textContent = `បញ្ជីវត្តមាន [${selectedSubject}] - ${khmerMonths[month-1]} ${year} (ថ្នាក់ ${selectedClass})`;
+        }
+
+        const headerDaysTr = document.getElementById('monthly-header-days');
+        const headerWeekdaysTr = document.getElementById('monthly-header-weekdays');
+        if (!headerDaysTr || !headerWeekdaysTr) return;
+
+        headerDaysTr.innerHTML = '<th rowspan="2" class="sticky-col-1">ល.រ</th><th rowspan="2" class="sticky-col-2">គោត្តនាម និង នាម</th><th rowspan="2" class="sticky-col-3">ភេទ</th>';
+        headerWeekdaysTr.innerHTML = '';
+
+        for(let d = 1; d <= daysInMonth; d++) {
+            const dateObj = new Date(year, month - 1, d);
+            headerDaysTr.insertAdjacentHTML('beforeend', `<th>${d}</th>`);
+            headerWeekdaysTr.insertAdjacentHTML('beforeend', `<th class="day-header">${khmerDays[dateObj.getDay()].substring(0, 3)}</th>`);
+        }
+        headerDaysTr.insertAdjacentHTML('beforeend', '<th colspan="3">សរុប</th>');
+        headerWeekdaysTr.insertAdjacentHTML('beforeend', '<th>P</th><th>A</th><th>L</th>');
+
+        const tbody = document.getElementById('monthly-list-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        
+        const classStudents = getUnifiedStudents()
+            .filter(s => getStudentClass(s) === selectedClass && isStudentActive(s) && s.name)
+            .sort((a, b) => a.name.localeCompare(b.name, 'km'));
+
+        classStudents.forEach((student, index) => {
+            let rowHtml = `<td class="sticky-col-1">${index + 1}</td><td class="text-left sticky-col-2">${student.name || '-'}</td><td class="sticky-col-3">${student.gender || '-'}</td>`;
+            let countP = 0, countA = 0, countL = 0;
+
+            for(let d = 1; d <= daysInMonth; d++) {
+                const dayStr = String(d).padStart(2, '0');
+                const dateKey = `${selectedSubject}_${selectedClass}_${monthVal}-${dayStr}`;
+                const status = (attendanceData[dateKey] && attendanceData[dateKey][student.id]) ? attendanceData[dateKey][student.id] : '-';
+                if(status === 'P') countP++; else if(status === 'A') countA++; else if(status === 'L') countL++;
+                rowHtml += `<td>${status}</td>`;
+            }
+            rowHtml += `<td>${countP}</td><td style="color:red;font-weight:bold;">${countA}</td><td style="color:orange;font-weight:bold;">${countL}</td>`;
+            const tr = document.createElement('tr');
+            tr.innerHTML = rowHtml;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function populateStudentSelect() {
+    const selectedClass = document.getElementById('search-student-class').value;
+    const selectEl = document.getElementById('search-student-id');
+    selectEl.innerHTML = '';
+
+    const classStudents = getUnifiedStudents().filter(s => getStudentClass(s) === selectedClass);
+
+    classStudents.forEach(s => {
+        const statusLabel = !isStudentActive(s) ? ' (បោះបង់)' : '';
+        selectEl.insertAdjacentHTML('beforeend', `<option value="${s.id}">${s.name}${statusLabel}</option>`);
+    });
+}
+
+    function searchByStudent() {
+        const selectedSubject = document.getElementById('search-student-subject').value;
+        const studentId = document.getElementById('search-student-id').value;
+        const selectedClass = document.getElementById('search-student-class').value;
+        const resultDiv = document.getElementById('student-absence-result');
+        
+        if (!resultDiv) return;
+
+        const student = getUnifiedStudents().find(s => s.id == studentId);
+        if(!student) return;
+
+        let absentDays = [];
+        const matchPrefix = `${selectedSubject}_${selectedClass}_`;
+        Object.keys(attendanceData).forEach(key => {
+            if(key.startsWith(matchPrefix)) {
+                const dateStr = key.replace(matchPrefix, '');
+                const status = attendanceData[key][studentId];
+                if(status === 'A' || status === 'L') absentDays.push({ date: dateStr, status: status });
+            }
+        });
+
+        if(absentDays.length === 0) {
+            resultDiv.innerHTML = `<p style="color:green; font-weight:bold; padding: 10px;">🎉 សិស្សឈ្មោះ ${student.name} មិនដែលអវត្តមានក្នុងមុខវិជ្ជា ${selectedSubject} ទេ!</p>`;
+            return;
+        }
+
+        let html = `<table><thead><tr><th>ថ្ងៃទី</th><th>ប្រភេទនៃការឈប់ (${selectedSubject})</th></tr></thead><tbody>`;
+        absentDays.forEach(item => {
+            html += `<tr><td>${item.date}</td><td>${item.status === 'A' ? '<span style="color:red;font-weight:bold;">A (អវត្តមាន)</span>' : '<span style="color:orange;font-weight:bold;">L (ច្បាប់)</span>'}</td></tr>`;
+        });
+        resultDiv.innerHTML = html + '</tbody></table>';
+    }
+
+    function searchTodayAbsence() {
+        const selectedSubject = document.getElementById('search-date-subject').value;
+        const selectedClass = document.getElementById('search-date-class').value;
+        const dateStr = document.getElementById('search-single-date').value;
+        const resultDiv = document.getElementById('date-absence-result');
+
+        if(!resultDiv) return;
+        if(!dateStr) return alert('សូមជ្រើសរើសថ្ងៃខែឆ្នាំ!');
+
+        const classStudents = getUnifiedStudents().filter(s => getStudentClass(s) === selectedClass && isStudentActive(s));
+        const key = `${selectedSubject}_${selectedClass}_${dateStr}`;
+        const dayData = attendanceData[key] || {};
+
+        let absentList = [];
+        classStudents.forEach(s => {
+            const status = dayData[s.id];
+            if(status === 'A' || status === 'L') {
+                absentList.push({ name: s.name, gender: s.gender, status: status });
+            }
+        });
+
+        if(absentList.length === 0) {
+            resultDiv.innerHTML = `<p style="color:green; font-weight:bold; padding:10px;">🎉 គ្មានសិស្សណាអវត្តមាន ឬសុំច្បាប់ក្នុងមុខវិជ្ជា ${selectedSubject} នៅថ្ងៃទី ${dateStr} ទេ!</p>`;
+            return;
+        }
+
+        absentList.sort((a, b) => a.name.localeCompare(b.name, 'km'));
+
+        let html = `<table><thead><tr><th>ល.រ</th><th>ឈ្មោះសិស្ស</th><th>ភេទ</th><th>ស្ថានភាព (${selectedSubject})</th></tr></thead><tbody>`;
+        absentList.forEach((item, idx) => {
+            const statusText = item.status === 'A' 
+                ? '<span style="color:red; font-weight:bold;">A (អវត្តមាន)</span>' 
+                : '<span style="color:orange; font-weight:bold;">L (ច្បាប់)</span>';
+            html += `<tr><td>${idx + 1}</td><td class="text-left">${item.name}</td><td>${item.gender}</td><td>${statusText}</td></tr>`;
+        });
+
+        resultDiv.innerHTML = html + '</tbody></table>';
+    }
+
+    function exportAbsentToPDF() {
+        const resultDiv = document.getElementById('date-absence-result');
+        if(!resultDiv || !resultDiv.querySelector('table')) {
+            return alert('⚠️ ពុំទាន់មានទិន្នន័យសម្រាប់ទាញយកជា PDF ទេ!');
+        }
+
+        const selectedSubject = document.getElementById('search-date-subject').value;
+        const selectedClass = document.getElementById('search-date-class').value;
+        const selectedDate = document.getElementById('search-single-date').value;
+
+        const pdfElement = document.createElement('div');
+        pdfElement.style.padding = '10px';
+        pdfElement.style.fontFamily = "'Kantumruy Pro', sans-serif";
+        
+        pdfElement.innerHTML = `
+            <div style="text-align: center; margin-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 16px; color: #1e3a8a;">របាយការណ៍អវត្តមានសិស្ស</h3>
+                <p style="margin: 4px 0 0 0; font-size: 11px;"><b>ថ្នាក់ទី៖</b> ${selectedClass} &nbsp;|&nbsp; <b>មុខវិជ្ជា៖</b> ${selectedSubject} &nbsp;|&nbsp; <b>កាលបរិច្ឆេទ៖</b> ${selectedDate}</p>
+            </div>
+            <div>${resultDiv.innerHTML}</div>
+        `;
+
+        const opt = {
+            margin:       [0.3, 0.4, 0.3, 0.4],
+            filename:     `របាយការណ៍អវត្តមាន_${selectedClass}_${selectedSubject}_${selectedDate}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(pdfElement).save();
+    }
+
+    function renderStudentManagement() {
+    const selectedClass = document.getElementById('manage-class-select').value;
+    const keyword = document.getElementById('search-student-keyword').value.trim().toLowerCase();
+    const filterStatus = document.getElementById('filter-status-select').value;
+    const tbody = document.getElementById('manage-student-body');
+    tbody.innerHTML = '';
+
+    let classStudents = getUnifiedStudents().filter(s => getStudentClass(s) === selectedClass);
+
+    if (keyword !== '') {
+        classStudents = classStudents.filter(s => 
+            s.name.toLowerCase().includes(keyword) || 
+            String(s.id).toLowerCase().includes(keyword)
+        );
+    }
+
+    if (filterStatus === 'active') {
+        classStudents = classStudents.filter(s => isStudentActive(s));
+    } else if (filterStatus === 'dropped') {
+        classStudents = classStudents.filter(s => !isStudentActive(s));
+    }
+
+    if (classStudents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="padding:15px; color:#64748b;">មិនមានទិន្នន័យសិស្សឡើយ!</td></tr>`;
+        return;
+    }
+
+    classStudents.forEach((student, index) => {
+        const isDropped = !isStudentActive(student);
+        const statusBadge = isDropped 
+            ? `<span class="badge-dropped">បោះបង់</span>` 
+            : `<span class="badge-active">កំពុងរៀន</span>`;
+
+        const toggleBtnHtml = isDropped
+            ? `<button class="btn-action" style="padding:4px 6px; font-size:11px; width:auto; background:#16a34a;" onclick="toggleStudentStatus('${student.id}', 'active')">រៀនវិញ</button>`
+            : `<button class="btn-action btn-warning" style="padding:4px 6px; font-size:11px; width:auto;" onclick="toggleStudentStatus('${student.id}', 'dropped')">បោះបង់</button>`;
+
+        tbody.insertAdjacentHTML('beforeend', `
+            <tr>
+                <td>${index + 1}</td>
+                <td class="col-id">${student.id}</td>
+                <td class="text-left">${student.name}</td>
+                <td>${student.gender}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <div style="display:flex; gap:4px; justify-content:center;">
+                        ${toggleBtnHtml}
+                        <button class="btn-action btn-danger" style="padding:4px 6px; font-size:11px; width:auto;" onclick="deleteStudent('${student.id}')">លុប</button>
+                    </div>
+                </td>
+            </tr>
+        `);
+    });
+}
+
+    function toggleStudentStatus(id, newStatus) {
+        const student = students.find(s => s.id == id);
+        if(!student) return;
+
+        const confirmMsg = newStatus === 'dropped' 
+            ? `តើអ្នកប្រាកដថាចង់កំណត់សិស្ស [${student.name}] ជា "បោះបង់ការសិក្សា"?`
+            : `តើអ្នកប្រាកដថាចង់ប្តូរសិស្ស [${student.name}] ឱ្យរៀនវិញ?`;
+
+        if(confirm(confirmMsg)) {
+            if(db) {
+                db.ref('students/' + id + '/status').set(newStatus);
+                setTimeout(() => { renderStudentManagement(); renderDataEntryStudents(); }, 400);
+            } else {
+                student.status = newStatus;
+                renderStudentManagement();
+                renderDataEntryStudents();
+            }
+        }
+    }
+
+    function saveStudent() {
+        const selectedClass = document.getElementById('manage-class-select').value;
+        const customIdInput = document.getElementById('student-custom-id');
+        const nameInput = document.getElementById('student-name');
+        const genderInput = document.getElementById('student-gender');
+
+        if(!nameInput || !nameInput.value.trim()) return alert('សូមបញ្ចូលឈ្មោះសិស្ស!');
+
+        let studentId = customIdInput ? customIdInput.value.trim() : '';
+        if(!studentId) {
+            const count = students.filter(s => (s.className === selectedClass || s.class === selectedClass)).length + 1;
+            studentId = `${selectedClass}-${count.toString().padStart(2, '0')}`;
+        }
+
+        const newStudent = {
+            id: studentId,
+            name: nameInput.value.trim(),
+            gender: genderInput ? genderInput.value : 'ប្រុស',
+            className: selectedClass,
+            class: selectedClass,
+            status: 'active'
+        };
+
+        if(db) {
+            db.ref('students/' + studentId).set(newStudent, function(err) {
+                if(!err) {
+                    nameInput.value = '';
+                    if (customIdInput) customIdInput.value = '';
+                    alert(`✅ បន្ថែមសិស្ស ID [${studentId}] រួចរាល់!`);
+                }
+            });
+        } else {
+            students.push(newStudent);
+            nameInput.value = '';
+            if (customIdInput) customIdInput.value = '';
+            renderStudentManagement();
+            alert(`✅ បន្ថែមក្នុង Memory រួចរាល់!`);
+        }
+    }
+
+    function exportStudentsToCSV() {
+        // Prefer manage-class-select; fallback to data-entry-class
+        const classEl = document.getElementById('manage-class-select') || document.getElementById('data-entry-class');
+        const selectedClass = classEl ? classEl.value : '7A';
+
+        // Use unified list (Firebase + Google Sheets) so no student is missing
+        const classStudents = getUnifiedStudents()
+            .filter(s => getStudentClass(s) === selectedClass && s.name)
+            .sort((a, b) => a.name.localeCompare(b.name, 'km'));
+
+        if (classStudents.length === 0) {
+            return alert(`មិនមានទិន្នន័យសិស្សក្នុងថ្នាក់ ${selectedClass} ទេ!`);
+        }
+
+        let csvContent = "\uFEFFid,name,gender,className,status,phone\n";
+        classStudents.forEach(s => {
+            const cName = getStudentClass(s) || selectedClass;
+            const id = String(s.id || '').replace(/"/g, '""');
+            const name = String(s.name || '').replace(/"/g, '""');
+            const gender = String(s.gender || '').replace(/"/g, '""');
+            const status = String(s.status || 'active').replace(/"/g, '""');
+            const phone = String(s.phone || '').replace(/"/g, '""');
+            csvContent += `"${id}","${name}","${gender}","${cName}","${status}","${phone}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `បញ្ជីឈ្មោះសិស្ស_ថ្នាក់_${selectedClass}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function importStudentsFromCSV() {
+        const fileInput = document.getElementById('import-csv-file');
+        if(!fileInput || !fileInput.files.length) return alert('សូមជ្រើសរើស File CSV ជាមុនសិន!');
+
+        const file = fileInput.files[0];
+        const selectedClass = document.getElementById('manage-class-select').value;
+        const isCleanFirst = confirm(`⚠️ តើអ្នកចង់សម្អាត (លុប) បញ្ជីឈ្មោះសិស្សចាស់ក្នុង "ថ្នាក់ ${selectedClass}" ចោលទាំងអស់ជាមុនសិនដែរឬទេ?`);
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const lines = e.target.result.split('\n');
+            let updates = {};
+            let count = 0;
+
+            lines.forEach((line, index) => {
+                if(index === 0 || !line.trim()) return;
+                const cols = line.split(',').map(c => c.replace(/"/g, '').trim());
+
+                if(cols.length >= 2 && cols[1] !== '') {
+                    const studentId = cols[0] || `${selectedClass}-${(count+1).toString().padStart(2, '0')}`;
+                    const targetClass = cols[3] || selectedClass;
+                    const stdObj = { 
+                        id: studentId, 
+                        name: cols[1], 
+                        gender: cols[2] || 'ប្រុស', 
+                        className: targetClass, 
+                        class: targetClass, 
+                        status: cols[4] || 'active' 
+                    };
+                    updates['students/' + studentId] = stdObj;
+                    count++;
+                }
+            });
+
+            if(count > 0 && db) {
+                if(isCleanFirst) {
+                    const classStudents = students.filter(s => (s.className === selectedClass || s.class === selectedClass));
+                    let deleteUpdates = {};
+                    classStudents.forEach(s => { deleteUpdates['students/' + s.id] = null; });
+
+                    db.ref().update(deleteUpdates, function() {
+                        db.ref().update(updates, function() {
+                            alert(`🎉 បាន Import សិស្សចំនួន ${count} នាក់ជោគជ័យ!`);
+                            fileInput.value = '';
+                        });
+                    });
+                } else {
+                    db.ref().update(updates, function() {
+                        alert(`🎉 បាន Import សិស្សចំនួន ${count} នាក់ជោគជ័យ!`);
+                        fileInput.value = '';
+                    });
+                }
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function deleteStudent(id) {
+        if(confirm(`តើអ្នកប្រាកដថាចង់លុបសិស្ស ID [${id}] នេះ?`)) {
+            if(db) {
+                db.ref('students/' + id).remove();
+                setTimeout(() => { renderStudentManagement(); renderDataEntryStudents(); }, 400);
+            } else {
+                students = students.filter(s => s.id !== id);
+                renderStudentManagement();
+                renderDataEntryStudents();
+            }
+        }
+    }
+
+    function formatTg(username) {
+        if (!username) return null;
+        let clean = username.toString().replace('@', '').trim();
+        return clean ? `https://t.me/${clean}` : null;
+    }
+
+    function populateStudentDropdown() {
+    const select = document.getElementById('studentSelect');
+    if (!select) return;
+
+    select.innerHTML = '<option value="ALL">-- បង្ហាញសិស្សទាំងអស់ --</option>';
+
+    let studentSource = getUnifiedStudents();
+
+    // Teacher → បង្ហាញតែថ្នាក់របស់ខ្លួន
+    if (userRole === 'teacher') {
+        studentSource = studentSource.filter(s => getStudentClass(s) === assignedClass);
+    }
+
+    studentSource.forEach(s => {
+        if (s.name) {
+            const opt = document.createElement('option');
+            opt.value = s.name;
+            opt.textContent = s.name;
+            select.appendChild(opt);
+        }
+    });
+}
+
+
+    function resolveStudentContact(s) {
+        if (!s) return { studentPhone: '', guardianName: '', guardianPhone: '', guardianRelation: '' };
+        const name = getStudentName(s);
+        const id = String(s.id || s.StudentID || '').trim();
+
+        // From student object itself (Firebase / unified)
+        let studentPhone = s.phone || s.studentPhone || s.StudentPhone || s['លេខទូរសព្ទ'] || s['លេខទូរសព្ទសិស្ស'] || '';
+        let guardianName = s.guardianName || s.GuardianName || s['ឈ្មោះអាណាព្យាបាល'] || '';
+        let guardianPhone = s.guardianPhone || s.GuardianPhone || s['លេខទូរសព្ទអាណាព្យាបាល'] || '';
+        let guardianRelation = s.guardianRelation || s['ត្រូវជា'] || '';
+
+        // Enrich from globalData.students (Google Sheet Students)
+        const sheetStudents = globalData.students || [];
+        const gs = sheetStudents.find(x => {
+            const xn = getStudentName(x);
+            const xid = String(x.StudentID || x['StudentID'] || x.id || '').trim();
+            return (id && xid && id === xid) || (name && xn === name);
+        });
+        if (gs) {
+            studentPhone = studentPhone || gs.StudentPhone || gs['StudentPhone'] || gs['លេខទូរសព្ទ'] || gs['លេខទូរសព្ទសិស្ស'] || '';
+            guardianName = guardianName || gs.GuardianName || gs['GuardianName'] || gs['ឈ្មោះអាណាព្យាបាល'] || '';
+            guardianPhone = guardianPhone || gs.GuardianPhone || gs['GuardianPhone'] || gs['លេខទូរសព្ទអាណាព្យាបាល'] || '';
+            guardianRelation = guardianRelation || gs['ត្រូវជា'] || gs.GuardianRelation || '';
+        }
+
+        // Enrich from parents sheet
+        const parents = globalData.parents || [];
+        const parent = parents.find(p =>
+            (p['ឈ្មោះសិស្ស'] || p.StudentName || '') === name ||
+            String(p.StudentID || p['StudentID'] || '') === id
+        );
+        if (parent) {
+            guardianName = guardianName || parent['ឈ្មោះអាណាព្យាបាល'] || parent.GuardianName || '';
+            guardianPhone = guardianPhone || parent['លេខទូរសព្ទ'] || parent.GuardianPhone || parent.Phone || '';
+            guardianRelation = guardianRelation || parent['ត្រូវជា'] || parent.Relation || '';
+        }
+
+        return {
+            studentPhone: String(studentPhone || '').trim(),
+            guardianName: String(guardianName || '').trim(),
+            guardianPhone: String(guardianPhone || '').trim(),
+            guardianRelation: String(guardianRelation || '').trim()
+        };
+    }
+
+function renderStudents() {
+    const container = document.getElementById('studentsContainer');
+    const selected = document.getElementById('studentSelect').value;
+
+    let studentList = getUnifiedStudents();
+
+    // Teacher filter
+    if (userRole === 'teacher') {
+        studentList = studentList.filter(s => getStudentClass(s) === assignedClass);
+    }
+
+    if (!studentList.length) {
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">គ្មានទិន្នន័យសិស្សឡើយ</p>';
+        return;
+    }
+
+    if (selected === 'ALL') {
+        let tableHTML = `
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ល.រ</th>
+                            <th>ឈ្មោះសិស្ស</th>
+                            <th>ភេទ</th>
+                            <th>លេខទូរសព្ទសិស្ស</th>
+                            <th>អាណាព្យាបាល</th>
+                            <th>ត្រូវជា</th>
+                            <th>លេខទូរសព្ទអាណាព្យាបាល</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        tableHTML += studentList.map((s, index) => {
+            const contact = resolveStudentContact(s);
+            return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td class="text-left">${s.name || '-'}</td>
+                    <td>${s.gender || '-'}</td>
+                    <td>${contact.studentPhone ? `<a href="tel:${contact.studentPhone}" style="color:var(--primary);text-decoration:none;white-space:nowrap;">📞 ${contact.studentPhone}</a>` : '-'}</td>
+                    <td class="text-left">${contact.guardianName || '-'}</td>
+                    <td>${contact.guardianRelation || '-'}</td>
+                    <td>${contact.guardianPhone ? `<a href="tel:${contact.guardianPhone}" style="color:var(--primary);text-decoration:none;white-space:nowrap;">📞 ${contact.guardianPhone}</a>` : '-'}</td>
+                </tr>
+            `;
+        }).join('');
+
+        tableHTML += `</tbody></table></div>`;
+        container.innerHTML = tableHTML;
+    } else {
+        const student = studentList.find(s => s.name === selected);
+        if (!student) return;
+
+        const contact = resolveStudentContact(student);
+        const guardianName = contact.guardianName || 'គ្មាន';
+        const guardianRelation = contact.guardianRelation || '';
+        const gPhone = contact.guardianPhone || '';
+        const sPhone = contact.studentPhone || '';
+        const cls = getStudentClass(student) || student.className || '-';
+
+        container.innerHTML = `
+            <div class="action-card" style="max-width:520px; overflow:hidden;">
+                <style>
+                    #studentsContainer .action-card::before { display: none !important; }
+                </style>
+                <div style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.95rem; color:var(--text); font-weight:400;">
+                    <div style="display:flex; align-items:flex-start; gap:12px;">
+                        <div style="width:42px;height:42px;border-radius:12px;background:#e0e7ff;color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0;">🎓</div>
+                        <div style="flex:1; line-height:1.75;">
+                            <div>ឈ្មោះសិស្ស៖ <strong>${student.name || '-'}</strong></div>
+                            <div style="margin-top:4px;">ភេទ៖ ${student.gender || '-'}</div>
+                            <div style="margin-top:4px;">ថ្នាក់ទី៖ ${cls}</div>
+                            <div style="margin-top:4px;">អ្នកអាណាព្យាបាល៖ ${guardianName}${guardianRelation ? ' (' + guardianRelation + ')' : ''}</div>
+                            <div style="margin-top:4px;">លេខទូរសព្ទផ្ទាល់ខ្លួន៖ ${sPhone || 'គ្មាន'}</div>
+                            <div style="margin-top:4px;">លេខទូរសព្ទអ្នកអាណាព្យាបាល៖ ${gPhone || 'គ្មាន'}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:nowrap; margin-top:6px;">
+                        ${sPhone
+                            ? `<a href="tel:${sPhone}" class="btn-action" style="flex:1; min-width:0; white-space:nowrap; font-size:0.85rem; background:linear-gradient(135deg,#c4b5fd 0%,#a78bfa 100%); color:#4c1d95; box-shadow:0 4px 10px rgba(167,139,250,0.3);">📞 សិស្ស</a>`
+                            : `<button class="btn-action" style="flex:1; min-width:0; white-space:nowrap; font-size:0.85rem; background:#ede9fe; color:#a78bfa; opacity:0.7; cursor:not-allowed;" disabled>📞 សិស្ស</button>`}
+                        ${gPhone
+                            ? `<a href="tel:${gPhone}" class="btn-action" style="flex:1; min-width:0; white-space:nowrap; font-size:0.85rem; background:linear-gradient(135deg,#0e7490 0%,#0369a1 100%); box-shadow:0 4px 10px rgba(3,105,161,0.25);">📞 អាណាព្យាបាល</a>`
+                            : `<button class="btn-action" style="flex:1; min-width:0; white-space:nowrap; font-size:0.85rem; opacity:0.5; cursor:not-allowed;" disabled>📞 អាណាព្យាបាល</button>`}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+    function findTeacherAssignmentSubject(tid, teacherName, classId) {
+        const assignments = globalData.teacherAssignments || globalData.TeacherAssignments || [];
+        const subjects = globalData.subjects || globalData.Subjects || [];
+        const cls = String(classId || '').trim().toUpperCase();
+        const tidStr = String(tid || '').trim();
+        const nameStr = String(teacherName || '').trim();
+        for (let i = 0; i < assignments.length; i++) {
+            const a = assignments[i];
+            const aClass = (a.ClassID || a['ClassID'] || a['ថ្នាក់'] || a.Class || '').toString().trim().toUpperCase();
+            if (aClass !== cls) continue;
+            const aTid = String(a.TeacherID || a['TeacherID'] || '').trim();
+            const aName = (a['ឈ្មោះគ្រូ'] || a.TeacherName || a['TeacherName'] || '').toString().trim();
+            const matchesById = tidStr && aTid && aTid === tidStr;
+            const matchesByName = nameStr && aName && aName === nameStr;
+            if (!matchesById && !matchesByName) continue;
+
+            const sid = a.SubjectID || a['SubjectID'] || '';
+            let subjectName = a['មុខវិជ្ជា'] || a.SubjectName || a['SubjectName'] || '';
+            if (!subjectName && sid && subjects.length) {
+                const s = subjects.find(x => (x.SubjectID || x['SubjectID'] || '') == sid);
+                if (s) subjectName = s.SubjectName || s['SubjectName'] || s['មុខវិជ្ជា'] || '';
+            }
+            if (subjectName) return subjectName.toString().trim();
+        }
+        return '';
+    }
+
+    function getHomeroomList() {
+        const result = [];
+        const seen = new Set();
+        const teachers = globalData.teachers || globalData.Teachers || globalData.masterTeachers || [];
+        const classes = globalData.classes || globalData.Classes || [];
+
+        function resolveTeacher(tid) {
+            if (!tid) return null;
+            const id = String(tid).trim();
+            return teachers.find(t =>
+                String(t.TeacherID || t['TeacherID'] || t.id || '').trim() === id
+            ) || null;
+        }
+
+        // 1) From Classes sheet (HomeroomTeacherID)
+        classes.forEach(c => {
+            const classId = (c.ClassID || c['ClassID'] || c['ថ្នាក់'] || '').toString().trim();
+            const className = (c.ClassName || c['ClassName'] || c['ឈ្មោះថ្នាក់'] || classId).toString().trim();
+            const tid = c.HomeroomTeacherID || c['HomeroomTeacherID'] || c['គ្រូបន្ទុក'] || '';
+            if (!classId && !tid) return;
+
+            const teacher = resolveTeacher(tid);
+            const name = teacher
+                ? (teacher.TeacherName || teacher['TeacherName'] || teacher['ឈ្មោះ'] || teacher.name || '')
+                : (c.HomeroomTeacherName || c['ឈ្មោះគ្រូ'] || '');
+            const phone = teacher
+                ? (teacher.Phone || teacher['Phone'] || teacher['លេខទូរសព្ទ'] || teacher.phone || '')
+                : (c['លេខទូរសព្ទ'] || '');
+            const telegram = teacher
+                ? (teacher.Telegram || teacher['Telegram'] || '')
+                : (c.Telegram || '');
+
+            const key = classId || className;
+            if (seen.has(key)) return;
+            seen.add(key);
+
+            const subjectTaught = findTeacherAssignmentSubject(tid, name, classId);
+
+            result.push({
+                'ឈ្មោះ': name || '—',
+                'លេខទូរសព្ទ': phone,
+                'Telegram': telegram,
+                'មុខវិជ្ជាបង្រៀន': subjectTaught || '-',
+                'Class': classId,
+                'ថ្នាក់': classId,
+                'TeacherID': tid,
+                source: 'classes'
+            });
+        });
+
+        // 2) Merge Firebase/manual homeroom entries
+        (globalData.homeroom || []).forEach(h => {
+            const classId = (h['Class'] || h['ថ្នាក់'] || '').toString().trim();
+            const name = (h['ឈ្មោះ'] || h.name || '').toString().trim();
+            if (!name) return;
+            const key = classId || name;
+            // Override / add
+            const existing = result.findIndex(x => (x['Class'] || '') === classId && classId);
+            let hrSubject = (h['មុខវិជ្ជាបង្រៀន'] || '').toString()
+                .replace(/\s*\(ថ្នាក់\s*[7-9][AB]\)/gi, '')
+                .replace(/គ្រូបន្ទុក\s*ថ្នាក់\s*[7-9][AB]/gi, '')
+                .trim();
+            if (!hrSubject) hrSubject = findTeacherAssignmentSubject(h.TeacherID || h['TeacherID'], name, classId);
+            const entry = {
+                'ឈ្មោះ': name,
+                'លេខទូរសព្ទ': h['លេខទូរសព្ទ'] || '',
+                'Telegram': h['Telegram'] || '',
+                'មុខវិជ្ជាបង្រៀន': hrSubject || '-',
+                'Class': classId,
+                'ថ្នាក់': classId,
+                source: 'homeroom'
+            };
+            if (existing >= 0) result[existing] = { ...result[existing], ...entry };
+            else if (!seen.has(key)) {
+                seen.add(key);
+                result.push(entry);
+            }
+        });
+
+        result.sort((a, b) => {
+            const ca = (a['Class'] || a['ថ្នាក់'] || '').toString();
+            const cb = (b['Class'] || b['ថ្នាក់'] || '').toString();
+            if (ca !== cb) return ca.localeCompare(cb, 'km');
+            return (a['ឈ្មោះ'] || '').localeCompare(b['ឈ្មោះ'] || '', 'km');
+        });
+        return result;
+    }
+
+    function renderHomeroom() {
+        const container = document.getElementById('homeroomContainer');
+        if (!container) return;
+
+        // Ensure classes/teachers loaded; if missing try Firebase then render
+        const needFetch = (!(globalData.classes || globalData.Classes || []).length ||
+            !(globalData.teachers || globalData.Teachers || []).length) && db;
+
+        if (needFetch && !window._homeroomFetchTried) {
+            window._homeroomFetchTried = true;
+            container.innerHTML = '<p style="color: var(--text-muted);">កំពុងទាញទិន្នន័យ...</p>';
+            Promise.all([
+                db.ref('homeroom').once('value'),
+                db.ref('masterTeachers').once('value')
+            ]).then(([hrSnap, mtSnap]) => {
+                if (hrSnap.val()) {
+                    globalData.homeroom = Array.isArray(hrSnap.val()) ? hrSnap.val() : Object.values(hrSnap.val());
+                }
+                if (mtSnap.val()) {
+                    globalData.masterTeachers = Array.isArray(mtSnap.val()) ? mtSnap.val() : Object.values(mtSnap.val());
+                }
+                renderHomeroomCards();
+            }).catch(() => renderHomeroomCards());
+            return;
+        }
+        renderHomeroomCards();
+    }
+
+    function renderHomeroomCards() {
+        const container = document.getElementById('homeroomContainer');
+        if (!container) return;
+
+        const list = getHomeroomList();
+        if (!list.length) {
+            container.innerHTML = '<p style="color: var(--text-muted); padding:1rem 0;">គ្មានទិន្នន័យគ្រូបន្ទុកថ្នាក់ — សូមបំពេញនៅទំព័រ <strong>បំពេញទិន្នន័យ</strong></p>';
+            return;
+        }
+
+        const tgSvg = `<svg style="width:24px;height:24px;fill:white;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>`;
+
+        container.innerHTML = list.map(h => {
+            const name = h['ឈ្មោះ'] || h.name || '-';
+            const subject = h['មុខវិជ្ជាបង្រៀន'] || '-';
+            const phone = h['លេខទូរសព្ទ'] || '';
+            const cls = h['Class'] || h['ថ្នាក់'] || '';
+            return `
+            <div class="student-card">
+                <div class="contact-header">
+                    <div class="avatar">👨‍🏫</div>
+                    <div class="contact-info">
+                        <div class="contact-name">${name}</div>
+                    </div>
+                </div>
+                <div class="info-item"><i class="fas fa-home" style="width:16px;text-align:center;"></i> <strong>${cls ? `គ្រូបន្ទុកថ្នាក់ទី ${cls}` : '-'}</strong></div>
+                <div class="info-item"><i class="fas fa-book" style="width:16px;text-align:center;"></i> ${subject}</div>
+                <div class="info-item"><i class="fas fa-phone" style="width:16px;text-align:center;"></i> លេខទូរសព្ទ៖ <strong>${phone || 'គ្មាន'}</strong></div>
+                <div class="icon-btn-group">
+                    ${phone ? `<a href="tel:${phone}" class="btn-icon-only btn-call" title="Call"><i class="fas fa-phone"></i></a>` : ''}
+                    ${formatTg(h['Telegram']) ? `<a href="${formatTg(h['Telegram'])}" target="_blank" class="btn-icon-only btn-telegram" title="Telegram">${tgSvg}</a>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderSubjectTeachers() {
+        const container = document.getElementById('subjectTeachersContainer');
+        if (!container) return;
+
+        const classFilterEl = document.getElementById('subjectTeacherClassFilter');
+        const classFilter = classFilterEl ? classFilterEl.value : 'ALL';
+        
+        if (!globalData.subjectTeachers || !globalData.subjectTeachers.length) {
+            container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">គ្មានទិន្នន័យគ្រូបង្រៀន</p>'; 
+            return;
+        }
+
+        let filteredTeachers = [];
+        if (classFilter === 'ALL') {
+            // All classes
+            ['7A','7B','8A','8B','9A','9B'].forEach(c => {
+                filteredTeachers = filteredTeachers.concat(getSubjectTeachersForClass(c));
+            });
+            // Deduplicate by name+subject
+            const seen = new Set();
+            filteredTeachers = filteredTeachers.filter(t => {
+                const key = `${t['ឈ្មោះគ្រូបង្រៀន']||t['ឈ្មោះ']}|${t['មុខវិជ្ជាបង្រៀន']}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        } else {
+            filteredTeachers = getSubjectTeachersForClass(classFilter);
+        }
+
+        if (filteredTeachers.length === 0) {
+            container.innerHTML = `<p style="color: var(--text-muted); grid-column: 1/-1; padding: 1rem 0;">គ្មានទិន្នន័យគ្រូបង្រៀនសម្រាប់ថ្នាក់ ${classFilter} ឡើយ</p>`;
+            return;
+        }
+
+        const tgSvg = `<svg style="width:24px;height:24px;fill:white;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>`;
+
+        container.innerHTML = filteredTeachers.map(t => `
+            <div class="student-card">
+                <div class="contact-header">
+                    <div class="avatar">👨‍🏫</div>
+                    <div class="contact-info">
+                        <div class="contact-name">${t['ឈ្មោះគ្រូបង្រៀន'] || t['ឈ្មោះ'] || '-'}</div>
+                    </div>
+                </div>
+                <div class="info-item"><i class="fas fa-book" style="width:16px;text-align:center;"></i> <strong>${t['មុខវិជ្ជាបង្រៀន'] || '-'}</strong></div>
+                <div class="info-item"><i class="fas fa-phone" style="width:16px;text-align:center;"></i> លេខទូរសព្ទ៖ <strong>${t['លេខទូរសព្ទ'] || 'គ្មាន'}</strong></div>
+                <div class="icon-btn-group">
+                    ${t['លេខទូរសព្ទ'] ? `<a href="tel:${t['លេខទូរសព្ទ']}" class="btn-icon-only btn-call" title="Call"><i class="fas fa-phone"></i></a>` : ''}
+                    ${formatTg(t['Telegram']) ? `<a href="${formatTg(t['Telegram'])}" target="_blank" class="btn-icon-only btn-telegram" title="Telegram">${tgSvg}</a>` : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function changeTimetableDay(direction) {
+        currentDayIndex = (currentDayIndex + direction + 7) % 7;
+        renderTimetable();
+    }
+
+    function renderTimetable() {
+        const displayDay = document.getElementById('displayScheduleDay');
+        const tbody = document.getElementById('timetableTable');
+        if (!displayDay || !tbody) return;
+
+        const dayName = khmerDays[currentDayIndex];
+        const classEl = document.getElementById('timetable-class');
+        let selectedClass = classEl ? classEl.value : '';
+
+        // Teacher role → force assigned class
+        if (userRole === 'teacher' && assignedClass) {
+            selectedClass = assignedClass;
+            if (classEl) {
+                classEl.value = assignedClass;
+                classEl.disabled = true;
+            }
+        }
+
+        displayDay.textContent = selectedClass
+            ? `កាលវិភាគ៖ ថ្ងៃ${dayName} (ថ្នាក់ ${selectedClass})`
+            : `កាលវិភាគ៖ ថ្ងៃ${dayName}`;
+
+        if (!globalData.timetable || !globalData.timetable.length) {
+            tbody.innerHTML = '<tr><td colspan="3" style="padding:15px; color:#64748b;">គ្មានទិន្នន័យកាលវិភាគ</td></tr>';
+            return;
+        }
+
+        const dayData = globalData.timetable.filter(t => {
+            const tDay = (t['ថ្ងៃ'] || t.Day || '').toString().trim();
+            if (tDay !== dayName) return false;
+
+            if (!selectedClass) return true;
+
+            const tClass = (t['Class'] || t['ថ្នាក់'] || t.class || '').toString().trim();
+            // Normalize class like getStudentClass
+            const m = tClass.match(/([7-9][AB])/i);
+            const normalized = m ? m[1].toUpperCase() : tClass;
+            return normalized === selectedClass || tClass === selectedClass || tClass.includes(selectedClass);
+        });
+
+        if (!dayData.length) {
+            tbody.innerHTML = `<tr><td colspan="3" style="padding:15px; color:#64748b;">គ្មានម៉ោងសិក្សាសម្រាប់ថ្ងៃ${dayName}${selectedClass ? ' (ថ្នាក់ ' + selectedClass + ')' : ''}ទេ</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = dayData.map(t => `
+            <tr>
+                <td>${t['ម៉ោង'] || t.Time || '-'}</td>
+                <td><strong>${t['មុខវិជ្ជា'] || '-'}</strong></td>
+                <td>${t['គ្រូបង្រៀន'] || '-'}</td>
+            </tr>
+        `).join('');
+    }
+
+    // ==================== ADMIN DATA ENTRY FUNCTIONS ====================
+
+    function loadDataEntryForms() {
+        const cls = document.getElementById('data-entry-class').value;
+
+        populateSubjectDropdowns();
+        populateTeacherNameDropdown();
+        renderMasterTeachersList();
+
+        // Homeroom from database
+        loadHomeroomForClass(cls);
+        cancelHomeroomEdit(); // show view mode
+
+        renderDataEntrySubjectList(cls);
+        renderDataEntryTimetableList(cls);
+        renderDataEntryStudents();
+    }
+
+
+    function findHomeroomForClass(cls) {
+        // Prefer joined list from Classes + Teachers + Firebase
+        const joined = getHomeroomList();
+        let h = joined.find(x => {
+            const hClass = (x['Class'] || x['ថ្នាក់'] || '').toString().trim().toUpperCase();
+            return hClass === String(cls).toUpperCase();
+        });
+        if (h) return h;
+        const list = globalData.homeroom || [];
+        h = list.find(x => {
+            const hClass = (x['Class'] || x['ថ្នាក់'] || x.class || '').toString().trim().toUpperCase();
+            return hClass === String(cls).toUpperCase();
+        });
+        if (h) return h;
+        h = list.find(x => {
+            const subj = (x['មុខវិជ្ជាបង្រៀន'] || '').toString();
+            return subj.includes(cls) || subj.includes('ថ្នាក់ ' + cls);
+        });
+        return h || null;
+    }
+
+    function loadHomeroomForClass(cls) {
+        const homeroom = findHomeroomForClass(cls) || {};
+        const hrName = (homeroom['ឈ្មោះ'] || homeroom.name || '').toString().trim();
+        const hrPhone = (homeroom['លេខទូរសព្ទ'] || '').toString().trim();
+        const hrTg = (homeroom['Telegram'] || '').toString().trim();
+        let hrSubj = (homeroom['មុខវិជ្ជាបង្រៀន'] || '').toString()
+            .replace(/\s*\(ថ្នាក់\s*[7-9][AB]\)/gi, '')
+            .replace(/គ្រូបន្ទុក\s*ថ្នាក់\s*[7-9][AB]/gi, '')
+            .trim();
+        // Guard against stale data where the subject field was mistakenly saved as the class name itself
+        if (/^ថ្នាក់\s*[7-9][AB]$/i.test(hrSubj)) hrSubj = '';
+        if (!hrSubj) hrSubj = findTeacherAssignmentSubject(homeroom['TeacherID'], hrName, cls);
+
+        // View panel
+        const setText = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val || '—';
+        };
+        setText('hr-view-name', hrName);
+        setText('hr-view-phone', hrPhone);
+        setText('hr-view-telegram', hrTg);
+        setText('hr-view-subject', hrSubj);
+
+        // Edit form fields
+        fillTeacherSelect('de-homeroom-name', hrName);
+        const phoneEl = document.getElementById('de-homeroom-phone');
+        const tgEl = document.getElementById('de-homeroom-telegram');
+        if (phoneEl) phoneEl.value = hrPhone;
+        if (tgEl) tgEl.value = hrTg;
+
+        populateSubjectDropdowns();
+        const subjEl = document.getElementById('de-homeroom-subject');
+        if (subjEl) {
+            if (hrSubj && ![...subjEl.options].some(o => o.value === hrSubj)) {
+                subjEl.insertAdjacentHTML('beforeend', `<option value="${hrSubj.replace(/"/g,'&quot;')}">${hrSubj}</option>`);
+            }
+            subjEl.value = hrSubj || '';
+        }
+
+        if (!hrPhone && hrName) onHomeroomTeacherChange();
+    }
+
+    function enableHomeroomEdit() {
+        const cls = document.getElementById('data-entry-class')?.value || '7A';
+        loadHomeroomForClass(cls);
+        const view = document.getElementById('homeroom-view');
+        const edit = document.getElementById('homeroom-edit');
+        if (view) view.style.display = 'none';
+        if (edit) edit.style.display = 'block';
+    }
+
+    function cancelHomeroomEdit() {
+        const view = document.getElementById('homeroom-view');
+        const edit = document.getElementById('homeroom-edit');
+        if (view) view.style.display = 'block';
+        if (edit) edit.style.display = 'none';
+        const cls = document.getElementById('data-entry-class')?.value || '7A';
+        loadHomeroomForClass(cls);
+    }
+
+    function saveHomeroomData() {
+        const cls = document.getElementById('data-entry-class').value;
+        const name = document.getElementById('de-homeroom-name').value.trim();
+        const phone = document.getElementById('de-homeroom-phone').value.trim();
+        const telegram = document.getElementById('de-homeroom-telegram').value.trim();
+        const subject = document.getElementById('de-homeroom-subject').value.trim() || findTeacherAssignmentSubject('', name, cls) || '';
+
+        if (!name) return alert('សូមបញ្ចូលឈ្មោះគ្រូបន្ទុក!');
+
+        if (!globalData.homeroom) globalData.homeroom = [];
+
+        // Update or add
+        let found = false;
+        globalData.homeroom = globalData.homeroom.map(h => {
+            const hCls = (h['Class'] || h['ថ្នាក់'] || '').toString().trim().toUpperCase();
+            const subj = (h['មុខវិជ្ជាបង្រៀន'] || '').toString();
+            if (hCls === String(cls).toUpperCase() || subj.includes(cls) || subj.includes(`ថ្នាក់ ${cls}`)) {
+                found = true;
+                return { 'ឈ្មោះ': name, 'លេខទូរសព្ទ': phone, 'Telegram': telegram, 'មុខវិជ្ជាបង្រៀន': subject, 'Class': cls, 'ថ្នាក់': cls };
+            }
+            return h;
+        });
+        if (!found) {
+            globalData.homeroom.push({ 'ឈ្មោះ': name, 'លេខទូរសព្ទ': phone, 'Telegram': telegram, 'មុខវិជ្ជាបង្រៀន': subject, 'Class': cls, 'ថ្នាក់': cls });
+        }
+
+        // Save to Firebase if available
+        if (db) {
+            db.ref('homeroom').set(globalData.homeroom, err => {
+                if (err) alert('❌ មានបញ្ហា៖ ' + err.message);
+                else {
+                    alert('✅ រក្សាទុកគ្រូបន្ទុកបានជោគជ័យ!');
+                    const cls2 = document.getElementById('data-entry-class')?.value;
+                    loadHomeroomForClass(cls2);
+                    cancelHomeroomEdit();
+                    renderHomeroom();
+                }
+            });
+        } else {
+            alert('✅ រក្សាទុកក្នុង Memory រួចរាល់! (Offline)');
+            loadHomeroomForClass(cls);
+            cancelHomeroomEdit();
+            renderHomeroom();
+        }
+    }
+
+    // Build subject-teacher list for a class from TeacherAssignments (preferred) or subjectTeachers
+    function getSubjectTeachersForClass(cls) {
+        const result = [];
+        const seen = new Set();
+
+        // 1) From TeacherAssignments + Teachers + Subjects (normalized sheets)
+        const assignments = globalData.teacherAssignments || globalData.TeacherAssignments || [];
+        const teachers = globalData.teachers || globalData.Teachers || [];
+        const subjects = globalData.subjects || globalData.Subjects || [];
+
+        if (assignments.length > 0) {
+            assignments.forEach(a => {
+                const aClass = (a.ClassID || a['ClassID'] || a['ថ្នាក់'] || a.Class || '').toString().trim().toUpperCase();
+                if (aClass !== cls.toUpperCase()) return;
+
+                const tid = a.TeacherID || a['TeacherID'] || '';
+                const sid = a.SubjectID || a['SubjectID'] || '';
+
+                // Resolve teacher
+                let teacherName = a['ឈ្មោះគ្រូ'] || a.TeacherName || a['TeacherName'] || '';
+                let phone = a['លេខទូរសព្ទ'] || a.Phone || '';
+                let telegram = a.Telegram || a['Telegram'] || '';
+                if (tid && teachers.length) {
+                    const t = teachers.find(x => (x.TeacherID || x['TeacherID'] || '') == tid);
+                    if (t) {
+                        teacherName = teacherName || t.TeacherName || t['TeacherName'] || t['ឈ្មោះ'] || t['ឈ្មោះគ្រូបង្រៀន'] || '';
+                        phone = phone || t.Phone || t['Phone'] || t['លេខទូរសព្ទ'] || '';
+                        telegram = telegram || t.Telegram || t['Telegram'] || '';
+                    }
+                }
+
+                // Resolve subject
+                let subjectName = a['មុខវិជ្ជា'] || a.SubjectName || a['SubjectName'] || '';
+                if (sid && subjects.length) {
+                    const s = subjects.find(x => (x.SubjectID || x['SubjectID'] || '') == sid);
+                    if (s) subjectName = subjectName || s.SubjectName || s['SubjectName'] || s['មុខវិជ្ជា'] || '';
+                }
+
+                if (!teacherName && !subjectName) return;
+                const displaySubject = subjectName ? `${subjectName} (ថ្នាក់ ${cls})` : `ថ្នាក់ ${cls}`;
+                const key = `${teacherName}|${displaySubject}`;
+                if (seen.has(key)) return;
+                seen.add(key);
+
+                result.push({
+                    'ឈ្មោះគ្រូបង្រៀន': teacherName,
+                    'ឈ្មោះ': teacherName,
+                    'មុខវិជ្ជាបង្រៀន': displaySubject,
+                    'លេខទូរសព្ទ': phone,
+                    'Telegram': telegram,
+                    'Class': cls,
+                    'ថ្នាក់': cls,
+                    'TeacherID': tid,
+                    'SubjectID': sid,
+                    'AssignmentID': a.AssignmentID || a['AssignmentID'] || '',
+                    source: 'assignments'
+                });
+            });
+        }
+
+        // 2) Fallback / merge from subjectTeachers (manual entries + legacy)
+        (globalData.subjectTeachers || []).forEach(t => {
+            const tClass = (t['Class'] || t['ថ្នាក់'] || t.class || '').toString().trim().toUpperCase();
+            const subj = (t['មុខវិជ្ជាបង្រៀន'] || '').toString();
+            const matchClass = tClass === cls.toUpperCase() ||
+                subj.includes(`(${cls})`) ||
+                subj.includes(`(ថ្នាក់ ${cls})`) ||
+                subj.includes(`ថ្នាក់ ${cls}`);
+            if (!matchClass) return;
+
+            const name = t['ឈ្មោះគ្រូបង្រៀន'] || t['ឈ្មោះ'] || '';
+            const key = `${name}|${subj}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+
+            result.push({
+                ...t,
+                'Class': tClass || cls,
+                'ថ្នាក់': tClass || cls,
+                source: t.source || 'subjectTeachers'
+            });
+        });
+
+        return result;
+    }
+
+    function renderDataEntrySubjectList(cls) {
+        const tbody = document.getElementById('de-subject-list');
+        if (!tbody) return;
+        if (!cls) cls = document.getElementById('data-entry-class')?.value || '';
+
+        const list = getSubjectTeachersForClass(cls);
+
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding:12px;color:#64748b;">មិនទាន់មានគ្រូមុខវិជ្ជាសម្រាប់ថ្នាក់ ${cls} ទេ</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = list.map((t, i) => {
+            const name = (t['ឈ្មោះគ្រូបង្រៀន'] || t['ឈ្មោះ'] || '-').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            // Find index in globalData.subjectTeachers for edit/delete of manual entries
+            const stList = globalData.subjectTeachers || [];
+            let stIndex = stList.findIndex(x =>
+                (x['ឈ្មោះគ្រូបង្រៀន'] || x['ឈ្មោះ']) === (t['ឈ្មោះគ្រូបង្រៀន'] || t['ឈ្មោះ']) &&
+                (x['មុខវិជ្ជាបង្រៀន'] || '') === (t['មុខវិជ្ជាបង្រៀន'] || '')
+            );
+            return `
+            <tr>
+                <td>${i + 1}</td>
+                <td class="text-left">${t['ឈ្មោះគ្រូបង្រៀន'] || t['ឈ្មោះ'] || '-'}</td>
+                <td class="text-left">${t['មុខវិជ្ជាបង្រៀន'] || '-'}</td>
+                <td>${t['លេខទូរសព្ទ'] || '-'}</td>
+                <td>${t['Telegram'] || '-'}</td>
+                <td>
+                    <div style="display:flex; gap:4px; justify-content:center; flex-wrap:wrap;">
+                        <button class="btn-action btn-warning" style="padding:4px 8px;font-size:11px;width:auto;" onclick="openEditSubjectTeacher(${stIndex}, '${cls}')">កែ</button>
+                        <button class="btn-action btn-danger" style="padding:4px 8px;font-size:11px;width:auto;" onclick="deleteSubjectTeacher('${name}', '${cls}')">លុប</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+
+    // Sync subject teacher to Google Sheet TeacherAssignments via Apps Script
+    function syncSubjectTeacherToSheet(payload, onOk, onErr) {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    console.log('Sheet sync OK', res);
+                    if (onOk) onOk(res);
+                })
+                .withFailureHandler(function(err) {
+                    console.error('Sheet sync failed', err);
+                    if (onErr) onErr(err);
+                    else alert('⚠️ Firebase រក្សាទុកហើយ ប៉ុន្តែ Sheet sync បរាជ័យ៖ ' + (err.message || err));
+                })
+                .saveTeacherAssignment(payload);
+        } else {
+            console.warn('google.script.run not available — Sheet not synced');
+            if (onOk) onOk(null);
+        }
+    }
+
+    function deleteSubjectTeacherFromSheet(teacherName, classId, onOk) {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(function(res) {
+                    if (onOk) onOk(res);
+                })
+                .withFailureHandler(function(err) {
+                    alert('⚠️ លុបក្នុង Firebase ហើយ ប៉ុន្តែ Sheet sync បរាជ័យ៖ ' + (err.message || err));
+                    if (onOk) onOk(null);
+                })
+                .deleteTeacherAssignment(teacherName, classId);
+        } else {
+            if (onOk) onOk(null);
+        }
+    }
+
+
+    function getSubjectNameList() {
+        const subjects = globalData.subjects || globalData.Subjects || [];
+        const names = [];
+        const seen = new Set();
+
+        subjects.forEach(s => {
+            const n = (s.SubjectName || s['SubjectName'] || s['មុខវិជ្ជា'] || s.name || '').toString().trim();
+            if (n && !seen.has(n)) {
+                seen.add(n);
+                names.push(n);
+            }
+        });
+
+        // Fallback: extract unique subject names from existing subjectTeachers / assignments
+        if (names.length === 0) {
+            (globalData.subjectTeachers || []).forEach(t => {
+                let n = (t['មុខវិជ្ជាបង្រៀន'] || '').toString().replace(/\s*\(ថ្នាក់\s*[7-9][AB]\)/gi, '').trim();
+                if (n && !seen.has(n)) {
+                    seen.add(n);
+                    names.push(n);
+                }
+            });
+        }
+
+        // Default list if still empty
+        if (names.length === 0) {
+            return ['ភាសាខ្មែរ', 'គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'អង់គ្លេស', 'កុំព្យូទ័រ', 'សីលធម៌', 'កីឡា', 'សិល្បៈ'];
+        }
+        return names.sort((a, b) => a.localeCompare(b, 'km'));
+    }
+
+    function populateSubjectDropdowns(selectedValue) {
+        const names = getSubjectNameList();
+        ['de-subject-subject', 'edit-subject-subject', 'de-timetable-subject', 'edit-tt-subject', 'de-homeroom-subject'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const current = selectedValue !== undefined && (id === 'de-subject-subject' || id === 'edit-subject-subject')
+                ? selectedValue : el.value;
+            const currentClean = (current || '').toString().replace(/\s*\(ថ្នាក់\s*[7-9][AB]\)/gi, '').trim();
+            el.innerHTML = '<option value="">-- ជ្រើសរើសមុខវិជ្ជា --</option>' +
+                names.map(n => `<option value="${n.replace(/"/g, '&quot;')}">${n}</option>`).join('');
+            if (currentClean) {
+                if (!names.includes(currentClean)) {
+                    el.insertAdjacentHTML('beforeend', `<option value="${currentClean.replace(/"/g, '&quot;')}">${currentClean}</option>`);
+                }
+                el.value = currentClean;
+            }
+        });
+    }
+
+    function fillTeacherSelect(selectId, selectedName) {
+        const el = document.getElementById(selectId);
+        if (!el) return;
+        const list = getMasterTeachersList();
+        const current = selectedName !== undefined ? selectedName : el.value;
+        el.innerHTML = '<option value="">-- ជ្រើសរើសគ្រូ --</option>' +
+            list.map(t => {
+                const ph = (t.phone || '').replace(/"/g, '&quot;');
+                const tg = (t.telegram || '').replace(/"/g, '&quot;');
+                return `<option value="${t.name.replace(/"/g, '&quot;')}" data-phone="${ph}" data-telegram="${tg}">${t.name}</option>`;
+            }).join('');
+        if (current) {
+            if (![...el.options].some(o => o.value === current)) {
+                el.insertAdjacentHTML('beforeend', `<option value="${current.replace(/"/g,'&quot;')}">${current}</option>`);
+            }
+            el.value = current;
+        }
+    }
+
+    function onHomeroomTeacherChange() {
+        const el = document.getElementById('de-homeroom-name');
+        if (!el) return;
+        const opt = el.options[el.selectedIndex];
+        if (!opt) return;
+        const phoneEl = document.getElementById('de-homeroom-phone');
+        const tgEl = document.getElementById('de-homeroom-telegram');
+        if (phoneEl) phoneEl.value = opt.getAttribute('data-phone') || phoneEl.value || '';
+        if (tgEl) tgEl.value = opt.getAttribute('data-telegram') || tgEl.value || '';
+    }
+
+
+    // ---------- Master Teachers (Firebase + Sheet) ----------
+    function normalizeTeacherRecord(t) {
+        if (!t) return null;
+        const name = (t.TeacherName || t['TeacherName'] || t['ឈ្មោះ'] || t['ឈ្មោះគ្រូ'] || t['ឈ្មោះគ្រូបង្រៀន'] || t.name || '').toString().trim();
+        if (!name) return null;
+        return {
+            id: t.TeacherID || t['TeacherID'] || t.id || '',
+            name: name,
+            phone: (t.Phone || t['Phone'] || t['លេខទូរសព្ទ'] || t.phone || '').toString().trim(),
+            telegram: (t.Telegram || t['Telegram'] || t.telegram || '').toString().trim()
+        };
+    }
+
+    function getMasterTeachersList() {
+        const map = new Map();
+
+        // From globalData.teachers (Sheet)
+        (globalData.teachers || globalData.Teachers || []).forEach(t => {
+            const n = normalizeTeacherRecord(t);
+            if (n) map.set(n.name, n);
+        });
+
+        // From Firebase-backed list if stored as array on globalData.masterTeachers
+        (globalData.masterTeachers || []).forEach(t => {
+            const n = normalizeTeacherRecord(t);
+            if (n) map.set(n.name, n);
+        });
+
+        // Also collect from subjectTeachers
+        (globalData.subjectTeachers || []).forEach(t => {
+            const n = normalizeTeacherRecord({
+                name: t['ឈ្មោះគ្រូបង្រៀន'] || t['ឈ្មោះ'],
+                phone: t['លេខទូរសព្ទ'],
+                telegram: t['Telegram']
+            });
+            if (n && !map.has(n.name)) map.set(n.name, n);
+        });
+
+        return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name, 'km'));
+    }
+
+    function populateTeacherNameDropdown(selectedName) {
+        fillTeacherSelect('de-subject-name', selectedName);
+        fillTeacherSelect('de-timetable-teacher', undefined);
+        fillTeacherSelect('de-homeroom-name', undefined);
+        fillTeacherSelect('edit-tt-teacher', undefined);
+    }
+
+    function onSubjectTeacherNameChange() {
+        const el = document.getElementById('de-subject-name');
+        if (!el) return;
+        const opt = el.options[el.selectedIndex];
+        if (!opt) return;
+        const phoneEl = document.getElementById('de-subject-phone');
+        const tgEl = document.getElementById('de-subject-telegram');
+        if (phoneEl) phoneEl.value = opt.getAttribute('data-phone') || '';
+        if (tgEl) tgEl.value = opt.getAttribute('data-telegram') || '';
+    }
+
+    function renderMasterTeachersList() {
+        const tbody = document.getElementById('de-teachers-list');
+        if (!tbody) return;
+        const list = getMasterTeachersList();
+        if (!list.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="padding:12px;color:#64748b;">មិនទាន់មានគ្រូក្នុងបញ្ជីទេ — បន្ថែមខាងលើ</td></tr>';
+            return;
+        }
+        tbody.innerHTML = list.map((t, i) => {
+            const safe = String(t.name).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            return `<tr>
+                <td>${i + 1}</td>
+                <td class="text-left">${t.name}</td>
+                <td>${t.phone || '-'}</td>
+                <td>${t.telegram || '-'}</td>
+                <td>
+                    <div style="display:flex; gap:4px; justify-content:center; flex-wrap:wrap;">
+                        <button class="btn-action btn-warning" style="padding:4px 8px;font-size:11px;width:auto;" onclick="openEditMasterTeacher('${safe}')">កែ</button>
+                        <button class="btn-action btn-danger" style="padding:4px 8px;font-size:11px;width:auto;" onclick="deleteMasterTeacher('${safe}')">លុប</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function openEditMasterTeacher(name) {
+        const t = getMasterTeachersList().find(x => x.name === name);
+        if (!t) return alert('រកមិនឃើញគ្រូ');
+        document.getElementById('edit-teacher-old-name').value = name;
+        document.getElementById('edit-teacher-name').value = t.name;
+        document.getElementById('edit-teacher-phone').value = t.phone || '';
+        document.getElementById('edit-teacher-telegram').value = t.telegram || '';
+        const modal = document.getElementById('editTeacherModal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeEditTeacherModal() {
+        const modal = document.getElementById('editTeacherModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function saveEditMasterTeacher() {
+        const oldName = document.getElementById('edit-teacher-old-name').value;
+        const name = document.getElementById('edit-teacher-name').value.trim();
+        const phone = document.getElementById('edit-teacher-phone').value.trim();
+        const telegram = document.getElementById('edit-teacher-telegram').value.trim();
+        if (!name) return alert('សូមបញ្ចូលឈ្មោះគ្រូ!');
+
+        const patch = (arr) => (arr || []).map(t => {
+            const n = normalizeTeacherRecord(t);
+            if (n && n.name === oldName) {
+                return { ...t, TeacherName: name, name: name, 'ឈ្មោះ': name, Phone: phone, 'លេខទូរសព្ទ': phone, Telegram: telegram };
+            }
+            return t;
+        });
+        globalData.masterTeachers = patch(globalData.masterTeachers);
+        globalData.teachers = patch(globalData.teachers);
+
+        const done = () => {
+            closeEditTeacherModal();
+            renderMasterTeachersList();
+            populateTeacherNameDropdown();
+            alert('✅ កែគ្រូបានជោគជ័យ!');
+        };
+        if (db) {
+            db.ref('masterTeachers').set(globalData.masterTeachers || [], err => {
+                if (err) alert('❌ ' + err.message);
+                else {
+                    if (typeof google !== 'undefined' && google.script && google.script.run) {
+                        google.script.run.withSuccessHandler(done).withFailureHandler(done)
+                            .saveTeacherToSheet({ teacherName: name, phone: phone, telegram: telegram });
+                    } else done();
+                }
+            });
+        } else done();
+    }
+
+    function addMasterTeacher() {
+        const name = document.getElementById('de-teacher-name').value.trim();
+        const phone = document.getElementById('de-teacher-phone').value.trim();
+        const telegram = document.getElementById('de-teacher-telegram').value.trim();
+        if (!name) return alert('សូមបញ្ចូលឈ្មោះគ្រូ!');
+
+        if (!globalData.masterTeachers) globalData.masterTeachers = [];
+        if (!globalData.teachers) globalData.teachers = [];
+
+        // Upsert in masterTeachers
+        const idx = globalData.masterTeachers.findIndex(t => {
+            const n = normalizeTeacherRecord(t);
+            return n && n.name === name;
+        });
+        const rec = { TeacherName: name, name: name, 'ឈ្មោះ': name, Phone: phone, 'លេខទូរសព្ទ': phone, Telegram: telegram };
+        if (idx >= 0) globalData.masterTeachers[idx] = { ...globalData.masterTeachers[idx], ...rec };
+        else globalData.masterTeachers.push(rec);
+
+        // Upsert in teachers array (Sheet shape)
+        const tIdx = globalData.teachers.findIndex(t => {
+            const n = normalizeTeacherRecord(t);
+            return n && n.name === name;
+        });
+        if (tIdx >= 0) globalData.teachers[tIdx] = { ...globalData.teachers[tIdx], ...rec };
+        else globalData.teachers.push({ TeacherID: 'T' + String(globalData.teachers.length + 1).padStart(3, '0'), ...rec });
+
+        document.getElementById('de-teacher-name').value = '';
+        document.getElementById('de-teacher-phone').value = '';
+        document.getElementById('de-teacher-telegram').value = '';
+
+        const finish = () => {
+            renderMasterTeachersList();
+            populateTeacherNameDropdown(name);
+            alert('✅ បន្ថែមគ្រូទៅបញ្ជីបានជោគជ័យ! (Firebase' + (typeof google !== 'undefined' && google.script ? ' + Sheet' : '') + ')');
+        };
+
+        if (db) {
+            db.ref('masterTeachers').set(globalData.masterTeachers, err => {
+                if (err) alert('❌ Firebase error: ' + err.message);
+                else {
+                    // Also try Sheet via Apps Script
+                    if (typeof google !== 'undefined' && google.script && google.script.run) {
+                        google.script.run
+                            .withSuccessHandler(finish)
+                            .withFailureHandler(function(e) {
+                                alert('⚠️ Firebase រួច — Sheet Teachers sync បរាជ័យ៖ ' + (e.message || e));
+                                finish();
+                            })
+                            .saveTeacherToSheet({ teacherName: name, phone: phone, telegram: telegram });
+                    } else {
+                        finish();
+                    }
+                }
+            });
+        } else if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+                .withSuccessHandler(finish)
+                .withFailureHandler(function(e) { alert('❌ Sheet error: ' + (e.message || e)); finish(); })
+                .saveTeacherToSheet({ teacherName: name, phone: phone, telegram: telegram });
+        } else {
+            finish();
+        }
+    }
+
+    function deleteMasterTeacher(name) {
+        if (!confirm('លុបគ្រូ [' + name + '] ពីបញ្ជី?')) return;
+        globalData.masterTeachers = (globalData.masterTeachers || []).filter(t => {
+            const n = normalizeTeacherRecord(t);
+            return !n || n.name !== name;
+        });
+        globalData.teachers = (globalData.teachers || []).filter(t => {
+            const n = normalizeTeacherRecord(t);
+            return !n || n.name !== name;
+        });
+
+        const done = () => {
+            renderMasterTeachersList();
+            populateTeacherNameDropdown();
+            alert('✅ បានលុបរួច');
+        };
+
+        if (db) {
+            db.ref('masterTeachers').set(globalData.masterTeachers, () => done());
+        } else {
+            done();
+        }
+    }
+
+    function addSubjectTeacher() {
+        const cls = document.getElementById('data-entry-class').value;
+        const name = document.getElementById('de-subject-name').value.trim();
+        let subject = document.getElementById('de-subject-subject').value.trim();
+        const phone = document.getElementById('de-subject-phone').value.trim();
+        const telegram = document.getElementById('de-subject-telegram').value.trim();
+
+        if (!name || !subject) return alert('សូមបញ្ចូលឈ្មោះគ្រូ និងមុខវិជ្ជា!');
+
+        // Auto append class if not present
+        if (!subject.includes(cls) && !subject.includes(`ថ្នាក់ ${cls}`)) {
+            subject = `${subject} (ថ្នាក់ ${cls})`;
+        }
+
+        if (!globalData.subjectTeachers) globalData.subjectTeachers = [];
+
+        globalData.subjectTeachers.push({
+            'ឈ្មោះគ្រូបង្រៀន': name,
+            'ឈ្មោះ': name,
+            'មុខវិជ្ជាបង្រៀន': subject,
+            'លេខទូរសព្ទ': phone,
+            'Telegram': telegram,
+            'Class': cls,
+            'ថ្នាក់': cls
+        });
+
+        // Clear inputs
+        document.getElementById('de-subject-name').value = '';
+        document.getElementById('de-subject-subject').value = '';
+        document.getElementById('de-subject-phone').value = '';
+        document.getElementById('de-subject-telegram').value = '';
+
+        const payload = {
+            teacherName: name,
+            subjectName: subject,
+            classId: cls,
+            phone: phone,
+            telegram: telegram
+        };
+
+        const afterSave = (sheetOk) => {
+            const sheetMsg = sheetOk !== null && typeof google !== 'undefined' && google.script
+                ? '\n(Firebase + Google Sheet TeacherAssignments)'
+                : '\n(Firebase — Sheet sync មិនដំណើរការបើមិន deploy តាម Apps Script)';
+            alert('✅ បន្ថែមគ្រូមុខវិជ្ជាបានជោគជ័យ!' + sheetMsg);
+            renderDataEntrySubjectList(cls);
+            renderSubjectTeachers();
+        };
+
+        if (db) {
+            db.ref('subjectTeachers').set(globalData.subjectTeachers, err => {
+                if (err) alert('❌ មានបញ្ហារក្សាទុកទៅ Firebase៖ ' + err.message);
+                else {
+                    syncSubjectTeacherToSheet(payload, () => afterSave(true), () => afterSave(false));
+                }
+            });
+        } else {
+            syncSubjectTeacherToSheet(payload, () => {
+                alert('✅ បន្ថែមរួច (Sheet) — គ្មាន Firebase');
+                renderDataEntrySubjectList(cls);
+                renderSubjectTeachers();
+            }, () => {
+                alert('⚠️ រក្សាទុកតែក្នុង Memory (គ្មាន Firebase / Sheet)!');
+                renderDataEntrySubjectList(cls);
+                renderSubjectTeachers();
+            });
+        }
+    }
+
+    function deleteSubjectTeacher(name, cls) {
+        if (!confirm(`តើអ្នកប្រាកដថាចង់លុបគ្រូ [${name}]?`)) return;
+
+        globalData.subjectTeachers = (globalData.subjectTeachers || []).filter(t => {
+            const tName = t['ឈ្មោះគ្រូបង្រៀន'] || t['ឈ្មោះ'] || '';
+            const tClass = (t['Class'] || t['ថ្នាក់'] || '').toString();
+            const subj = (t['មុខវិជ្ជាបង្រៀន'] || '').toString();
+            const isThisClass = tClass === cls || subj.includes(cls) || subj.includes(`ថ្នាក់ ${cls}`);
+            return !(tName === name && isThisClass);
+        });
+
+        const saveDone = () => {
+            deleteSubjectTeacherFromSheet(name, cls, () => {
+                alert('✅ បានលុបរួចរាល់! (Firebase + Sheet)');
+                renderDataEntrySubjectList(cls);
+                renderSubjectTeachers();
+            });
+        };
+
+        if (db) {
+            db.ref('subjectTeachers').set(globalData.subjectTeachers, err => {
+                if (err) alert('❌ មិនអាចរក្សាទុកទៅ Database៖ ' + err.message);
+                else saveDone();
+            });
+        } else {
+            saveDone();
+        }
+    }
+
+    function openEditSubjectTeacher(stIndex, cls) {
+        if (stIndex < 0 || !globalData.subjectTeachers || !globalData.subjectTeachers[stIndex]) {
+            // Entry comes only from TeacherAssignments sheet — copy into subjectTeachers for editing
+            alert('⚠️ គ្រូនេះមកពី Sheet TeacherAssignments។ សូមបន្ថែម/កែតាមទម្រង់ខាងលើ ឬកែក្នុង Sheet។\n\nអ្នកអាចបន្ថែមគ្រូថ្មីពី form ខាងលើ រួចកែបាន។');
+            return;
+        }
+        const t = globalData.subjectTeachers[stIndex];
+        document.getElementById('edit-subject-index').value = stIndex;
+        document.getElementById('edit-subject-class').value = cls;
+        document.getElementById('edit-subject-name').value = t['ឈ្មោះគ្រូបង្រៀន'] || t['ឈ្មោះ'] || '';
+        const rawSubj = t['មុខវិជ្ជាបង្រៀន'] || '';
+        populateSubjectDropdowns(rawSubj);
+        document.getElementById('edit-subject-phone').value = t['លេខទូរសព្ទ'] || '';
+        document.getElementById('edit-subject-telegram').value = t['Telegram'] || '';
+        const modal = document.getElementById('editSubjectModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeEditSubjectModal() {
+        const modal = document.getElementById('editSubjectModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function saveEditSubjectTeacher() {
+        const stIndex = parseInt(document.getElementById('edit-subject-index').value, 10);
+        const cls = document.getElementById('edit-subject-class').value;
+        const name = document.getElementById('edit-subject-name').value.trim();
+        let subject = document.getElementById('edit-subject-subject').value.trim();
+        const phone = document.getElementById('edit-subject-phone').value.trim();
+        const telegram = document.getElementById('edit-subject-telegram').value.trim();
+
+        if (!name || !subject) return alert('សូមបញ្ចូលឈ្មោះគ្រូ និងមុខវិជ្ជា!');
+        if (!subject.includes(cls) && !subject.includes(`ថ្នាក់ ${cls}`)) {
+            subject = `${subject.replace(/\s*\(ថ្នាក់\s*[7-9][AB]\)/, '').trim()} (ថ្នាក់ ${cls})`;
+        }
+
+        if (!globalData.subjectTeachers || stIndex < 0 || stIndex >= globalData.subjectTeachers.length) {
+            return alert('❌ រកមិនឃើញទិន្នន័យសម្រាប់កែ!');
+        }
+
+        globalData.subjectTeachers[stIndex] = {
+            ...globalData.subjectTeachers[stIndex],
+            'ឈ្មោះគ្រូបង្រៀន': name,
+            'ឈ្មោះ': name,
+            'មុខវិជ្ជាបង្រៀន': subject,
+            'លេខទូរសព្ទ': phone,
+            'Telegram': telegram,
+            'Class': cls,
+            'ថ្នាក់': cls
+        };
+
+        const payload = {
+            teacherName: name,
+            subjectName: subject,
+            classId: cls,
+            phone: phone,
+            telegram: telegram
+        };
+
+        const finish = () => {
+            syncSubjectTeacherToSheet(payload, () => {
+                closeEditSubjectModal();
+                alert('✅ រក្សាទុកការកែសម្រួលបានជោគជ័យ! (Firebase + Sheet)');
+                renderDataEntrySubjectList(cls);
+                renderSubjectTeachers();
+            }, () => {
+                closeEditSubjectModal();
+                alert('✅ រក្សាទុក Firebase រួច — Sheet sync បរាជ័យ');
+                renderDataEntrySubjectList(cls);
+                renderSubjectTeachers();
+            });
+        };
+
+        if (db) {
+            db.ref('subjectTeachers').set(globalData.subjectTeachers, err => {
+                if (err) alert('❌ មិនអាចរក្សាទុកទៅ Database៖ ' + err.message);
+                else finish();
+            });
+        } else {
+            finish();
+        }
+    }
+
+    function renderDataEntryTimetableList(cls) {
+        const tbody = document.getElementById('de-timetable-list');
+        if (!tbody) return;
+
+        if (!cls) cls = document.getElementById('data-entry-class')?.value || '';
+
+        // Filter by Class (supports both Khmer key and English "Class")
+        const list = (globalData.timetable || []).filter(t => {
+            const tClass = (t['Class'] || t['ថ្នាក់'] || t.class || '').toString().trim();
+            return !cls || tClass === cls || tClass === '' || tClass.includes(cls);
+        });
+
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding:12px;color:#64748b;">មិនទាន់មានកាលវិភាគសម្រាប់ថ្នាក់ ${cls} ទេ</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = list.map((t, i) => {
+            // Find real index in full array for correct delete
+            const realIndex = (globalData.timetable || []).indexOf(t);
+            const tClass = t['Class'] || t['ថ្នាក់'] || t.class || cls || '-';
+            return `
+            <tr>
+                <td><span class="badge">${tClass}</span></td>
+                <td>${t['ថ្ងៃ'] || t.Day || '-'}</td>
+                <td>${t['ម៉ោង'] || t.Time || '-'}</td>
+                <td class="text-left">${t['មុខវិជ្ជា'] || '-'}</td>
+                <td class="text-left">${t['គ្រូបង្រៀន'] || '-'}</td>
+                <td>
+                    <div style="display:flex; gap:4px; justify-content:center; flex-wrap:wrap;">
+                        <button class="btn-action btn-warning" style="padding:4px 8px;font-size:11px;width:auto;" onclick="openEditTimetableSlot(${realIndex})">កែ</button>
+                        <button class="btn-action btn-danger" style="padding:4px 8px;font-size:11px;width:auto;" onclick="deleteTimetableSlot(${realIndex})">លុប</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function openEditTimetableSlot(index) {
+        const t = (globalData.timetable || [])[index];
+        if (!t) return;
+        document.getElementById('edit-tt-index').value = index;
+        document.getElementById('edit-tt-day').value = t['ថ្ងៃ'] || t.Day || 'ច័ន្ទ';
+        document.getElementById('edit-tt-time').value = t['ម៉ោង'] || t.Time || '';
+        populateSubjectDropdowns();
+        fillTeacherSelect('edit-tt-teacher', t['គ្រូបង្រៀន'] || '');
+        const subj = (t['មុខវិជ្ជា'] || '').toString().trim();
+        const subjEl = document.getElementById('edit-tt-subject');
+        if (subjEl && subj) {
+            if (![...subjEl.options].some(o => o.value === subj)) {
+                subjEl.insertAdjacentHTML('beforeend', `<option value="${subj.replace(/"/g,'&quot;')}">${subj}</option>`);
+            }
+            subjEl.value = subj;
+        }
+        const modal = document.getElementById('editTimetableModal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeEditTimetableModal() {
+        const modal = document.getElementById('editTimetableModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function saveEditTimetableSlot() {
+        const index = parseInt(document.getElementById('edit-tt-index').value, 10);
+        if (index < 0 || !globalData.timetable || !globalData.timetable[index]) return;
+        const cls = document.getElementById('data-entry-class')?.value || globalData.timetable[index]['Class'] || '';
+        const day = document.getElementById('edit-tt-day').value;
+        const time = document.getElementById('edit-tt-time').value.trim();
+        const subject = document.getElementById('edit-tt-subject').value.trim();
+        const teacher = document.getElementById('edit-tt-teacher').value.trim();
+        if (!time || !subject) return alert('សូមបញ្ចូលម៉ោង និងមុខវិជ្ជា!');
+
+        globalData.timetable[index] = {
+            ...globalData.timetable[index],
+            'Class': cls,
+            'ថ្នាក់': cls,
+            'ថ្ងៃ': day,
+            'Day': day,
+            'ម៉ោង': time,
+            'Time': time,
+            'មុខវិជ្ជា': subject,
+            'គ្រូបង្រៀន': teacher
+        };
+
+        const done = () => {
+            closeEditTimetableModal();
+            renderDataEntryTimetableList(cls);
+            renderTimetable();
+            alert('✅ កែកាលវិភាគបានជោគជ័យ!');
+        };
+        if (db) {
+            db.ref('timetable').set(globalData.timetable, err => {
+                if (err) alert('❌ ' + err.message);
+                else done();
+            });
+        } else done();
+    }
+
+    function addTimetableSlot() {
+        const cls = document.getElementById('data-entry-class').value;
+        const day = document.getElementById('de-timetable-day').value;
+        const time = document.getElementById('de-timetable-time').value.trim();
+        const subject = document.getElementById('de-timetable-subject').value.trim();
+        const teacher = document.getElementById('de-timetable-teacher').value.trim();
+
+        if (!time || !subject) return alert('សូមបញ្ចូលម៉ោង និងមុខវិជ្ជា!');
+
+        if (!globalData.timetable) globalData.timetable = [];
+
+        globalData.timetable.push({
+            'Class': cls,
+            'ថ្នាក់': cls,
+            'ថ្ងៃ': day,
+            'Day': day,
+            'ម៉ោង': time,
+            'Time': time,
+            'មុខវិជ្ជា': subject,
+            'គ្រូបង្រៀន': teacher
+        });
+
+        document.getElementById('de-timetable-time').value = '';
+        document.getElementById('de-timetable-subject').value = '';
+        document.getElementById('de-timetable-teacher').value = '';
+
+        if (db) {
+            db.ref('timetable').set(globalData.timetable, err => {
+                if (err) alert('❌ មានបញ្ហា៖ ' + err.message);
+                else {
+                    alert('✅ បន្ថែមម៉ោងសម្រាប់ថ្នាក់ ' + cls + ' បានជោគជ័យ!');
+                    renderDataEntryTimetableList(cls);
+                    renderTimetable();
+                }
+            });
+        } else {
+            alert('✅ បន្ថែមក្នុង Memory រួចរាល់!');
+            renderDataEntryTimetableList(cls);
+            renderTimetable();
+        }
+    }
+
+    function deleteTimetableSlot(index) {
+        if (!confirm('តើអ្នកប្រាកដថាចង់លុបម៉ោងនេះ?')) return;
+        if (index < 0 || !globalData.timetable) return;
+        globalData.timetable.splice(index, 1);
+
+        const cls = document.getElementById('data-entry-class')?.value || '';
+        if (db) {
+            db.ref('timetable').set(globalData.timetable, () => {
+                renderDataEntryTimetableList(cls);
+                renderTimetable();
+            });
+        } else {
+            renderDataEntryTimetableList(cls);
+            renderTimetable();
+        }
+    }
+
+    // ---------- Data Entry: Students ----------
+    function renderDataEntryStudents() {
+        const selectedClass = document.getElementById('data-entry-class').value;
+        const keyword = (document.getElementById('de-search-student-keyword')?.value || '').trim().toLowerCase();
+        const filterStatus = document.getElementById('de-filter-status-select')?.value || 'active';
+        const tbody = document.getElementById('de-manage-student-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        let classStudents = getUnifiedStudents().filter(s => getStudentClass(s) === selectedClass);
+
+        if (keyword !== '') {
+            classStudents = classStudents.filter(s =>
+                s.name.toLowerCase().includes(keyword) ||
+                String(s.id).toLowerCase().includes(keyword)
+            );
+        }
+
+        if (filterStatus === 'active') {
+            classStudents = classStudents.filter(s => isStudentActive(s));
+        } else if (filterStatus === 'dropped') {
+            classStudents = classStudents.filter(s => !isStudentActive(s));
+        }
+
+        if (classStudents.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding:15px; color:#64748b;">មិនមានទិន្នន័យសិស្សឡើយ!</td></tr>`;
+            return;
+        }
+
+        classStudents.forEach((student, index) => {
+            const isDropped = !isStudentActive(student);
+            const statusBadge = isDropped
+                ? `<span class="badge-dropped">បោះបង់</span>`
+                : `<span class="badge-active">កំពុងរៀន</span>`;
+
+            const toggleBtnHtml = isDropped
+                ? `<button class="btn-action" style="padding:4px 6px; font-size:11px; width:auto; background:#16a34a;" onclick="toggleStudentStatus('${student.id}', 'active')">រៀនវិញ</button>`
+                : `<button class="btn-action btn-warning" style="padding:4px 6px; font-size:11px; width:auto;" onclick="toggleStudentStatus('${student.id}', 'dropped')">បោះបង់</button>`;
+
+            tbody.insertAdjacentHTML('beforeend', `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td class="col-id">${student.id}</td>
+                    <td class="text-left">${student.name}</td>
+                    <td>${student.gender}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div style="display:flex; gap:4px; justify-content:center;">
+                            ${toggleBtnHtml}
+                            <button class="btn-action btn-danger" style="padding:4px 6px; font-size:11px; width:auto;" onclick="deleteStudent('${student.id}')">លុប</button>
+                        </div>
+                    </td>
+                </tr>
+            `);
+        });
+    }
+
+    function saveStudentFromDataEntry() {
+        const selectedClass = document.getElementById('data-entry-class').value;
+        const customIdInput = document.getElementById('de-student-custom-id');
+        const nameInput = document.getElementById('de-student-name');
+        const genderInput = document.getElementById('de-student-gender');
+
+        if (!nameInput || !nameInput.value.trim()) return alert('សូមបញ្ចូលឈ្មោះសិស្ស!');
+
+        let studentId = customIdInput ? customIdInput.value.trim() : '';
+        if (!studentId) {
+            const count = students.filter(s => (s.className === selectedClass || s.class === selectedClass)).length + 1;
+            studentId = `${selectedClass}-${count.toString().padStart(2, '0')}`;
+        }
+
+        const newStudent = {
+            id: studentId,
+            name: nameInput.value.trim(),
+            gender: genderInput ? genderInput.value : 'ប្រុស',
+            className: selectedClass,
+            class: selectedClass,
+            status: 'active'
+        };
+
+        if (db) {
+            db.ref('students/' + studentId).set(newStudent, function(err) {
+                if (!err) {
+                    nameInput.value = '';
+                    if (customIdInput) customIdInput.value = '';
+                    alert(`✅ បន្ថែមសិស្ស ID [${studentId}] រួចរាល់!`);
+                    // Firebase listener will refresh students array
+                    setTimeout(renderDataEntryStudents, 500);
+                }
+            });
+        } else {
+            students.push(newStudent);
+            nameInput.value = '';
+            if (customIdInput) customIdInput.value = '';
+            renderDataEntryStudents();
+            alert(`✅ បន្ថែមក្នុង Memory រួចរាល់!`);
+        }
+    }
+
+    function exportStudentsToCSVFromDataEntry() {
+        // Temporarily set manage-class-select so existing export works
+        const cls = document.getElementById('data-entry-class').value;
+        const oldSelect = document.getElementById('manage-class-select');
+        if (oldSelect) oldSelect.value = cls;
+        exportStudentsToCSV();
+    }
+
+    function importStudentsFromCSVFromDataEntry() {
+        const cls = document.getElementById('data-entry-class').value;
+        const oldSelect = document.getElementById('manage-class-select');
+        if (oldSelect) oldSelect.value = cls;
+
+        // Use de-import file if present
+        const deFile = document.getElementById('de-import-csv-file');
+        const oldFile = document.getElementById('import-csv-file');
+        if (deFile && deFile.files.length && oldFile) {
+            // Copy file to original input is hard; reimplement quick import
+            const file = deFile.files[0];
+            const isCleanFirst = confirm(`⚠️ តើអ្នកចង់សម្អាតបញ្ជីសិស្សចាស់ក្នុង "ថ្នាក់ ${cls}" ចោលទាំងអស់ជាមុនសិនដែរឬទេ?`);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines = e.target.result.split('\n');
+                let updates = {};
+                let count = 0;
+                lines.forEach((line, index) => {
+                    if (index === 0 || !line.trim()) return;
+                    const cols = line.split(',').map(c => c.replace(/"/g, '').trim());
+                    if (cols.length >= 2 && cols[1] !== '') {
+                        const studentId = cols[0] || `${cls}-${(count+1).toString().padStart(2, '0')}`;
+                        const targetClass = cols[3] || cls;
+                        updates['students/' + studentId] = {
+                            id: studentId,
+                            name: cols[1],
+                            gender: cols[2] || 'ប្រុស',
+                            className: targetClass,
+                            class: targetClass,
+                            status: cols[4] || 'active'
+                        };
+                        count++;
+                    }
+                });
+                if (count > 0 && db) {
+                    if (isCleanFirst) {
+                        const classStudents = students.filter(s => (s.className === cls || s.class === cls));
+                        let deleteUpdates = {};
+                        classStudents.forEach(s => { deleteUpdates['students/' + s.id] = null; });
+                        db.ref().update(deleteUpdates, function() {
+                            db.ref().update(updates, function() {
+                                alert(`🎉 បាន Import សិស្សចំនួន ${count} នាក់ជោគជ័យ!`);
+                                deFile.value = '';
+                                setTimeout(renderDataEntryStudents, 500);
+                            });
+                        });
+                    } else {
+                        db.ref().update(updates, function() {
+                            alert(`🎉 បាន Import សិស្សចំនួន ${count} នាក់ជោគជ័យ!`);
+                            deFile.value = '';
+                            setTimeout(renderDataEntryStudents, 500);
+                        });
+                    }
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            alert('សូមជ្រើសរើស File CSV ជាមុនសិន!');
+        }
+    }
+
+    // After toggle/delete student, also refresh data entry list
+    const _origToggle = typeof toggleStudentStatus === 'function' ? toggleStudentStatus : null;
+    // Patch: call renderDataEntryStudents after status change (Firebase will trigger reload anyway)
+</script>
+
+
+
+<!-- Edit Master Teacher Modal -->
+<div id="editTeacherModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:10001; align-items:center; justify-content:center;">
+    <div style="background:white; padding:1.5rem; border-radius:16px; width:90%; max-width:420px; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+        <h3 style="margin:0 0 1rem 0; font-size:1.1rem;">✏️ កែសម្រួលគ្រូ</h3>
+        <input type="hidden" id="edit-teacher-old-name">
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>ឈ្មោះគ្រូ៖</label>
+            <input type="text" id="edit-teacher-name">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>លេខទូរសព្ទ៖</label>
+            <input type="text" id="edit-teacher-phone">
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+            <label>Telegram៖</label>
+            <input type="text" id="edit-teacher-telegram" placeholder="@username">
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-action" style="flex:1;" onclick="saveEditMasterTeacher()">💾 រក្សាទុក</button>
+            <button class="btn-action btn-danger" style="flex:1;" onclick="closeEditTeacherModal()">បោះបង់</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Timetable Modal -->
+<div id="editTimetableModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:10001; align-items:center; justify-content:center;">
+    <div style="background:white; padding:1.5rem; border-radius:16px; width:90%; max-width:420px; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+        <h3 style="margin:0 0 1rem 0; font-size:1.1rem;">✏️ កែសម្រួលកាលវិភាគ</h3>
+        <input type="hidden" id="edit-tt-index">
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>ថ្ងៃ៖</label>
+            <select id="edit-tt-day">
+                <option value="ច័ន្ទ">ច័ន្ទ</option>
+                <option value="អង្គារ">អង្គារ</option>
+                <option value="ពុធ">ពុធ</option>
+                <option value="ព្រហស្បតិ៍">ព្រហស្បតិ៍</option>
+                <option value="សុក្រ">សុក្រ</option>
+                <option value="សៅរ៍">សៅរ៍</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>ម៉ោង៖</label>
+            <input type="text" id="edit-tt-time" placeholder="07:00-08:00">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>មុខវិជ្ជា៖</label>
+            <select id="edit-tt-subject"><option value="">-- ជ្រើសរើស --</option></select>
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+            <label>គ្រូបង្រៀន៖</label>
+            <select id="edit-tt-teacher"><option value="">-- ជ្រើសរើស --</option></select>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-action" style="flex:1;" onclick="saveEditTimetableSlot()">💾 រក្សាទុក</button>
+            <button class="btn-action btn-danger" style="flex:1;" onclick="closeEditTimetableModal()">បោះបង់</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Subject Teacher Modal -->
+<div id="editSubjectModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:10001; align-items:center; justify-content:center;">
+    <div style="background:white; padding:1.5rem; border-radius:16px; width:90%; max-width:420px; box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+        <h3 style="margin:0 0 1rem 0; font-size:1.1rem;">✏️ កែសម្រួលគ្រូមុខវិជ្ជា</h3>
+        <input type="hidden" id="edit-subject-index">
+        <input type="hidden" id="edit-subject-class">
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>ឈ្មោះគ្រូ៖</label>
+            <input type="text" id="edit-subject-name">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>មុខវិជ្ជា៖</label>
+            <select id="edit-subject-subject">
+                <option value="">-- ជ្រើសរើសមុខវិជ្ជា --</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>លេខទូរសព្ទ៖</label>
+            <input type="text" id="edit-subject-phone">
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+            <label>Telegram៖</label>
+            <input type="text" id="edit-subject-telegram" placeholder="@username">
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-action" style="flex:1;" onclick="saveEditSubjectTeacher()">💾 រក្សាទុក</button>
+            <button class="btn-action btn-danger" style="flex:1;" onclick="closeEditSubjectModal()">បោះបង់</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
