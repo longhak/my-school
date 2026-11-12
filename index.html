@@ -17,6 +17,8 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
+    <!-- Noto Sans Khmer (Home Dashboard) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- PWA Settings -->
     <meta name="theme-color" content="#4f46e5">
@@ -647,17 +649,257 @@ body * {visibility:hidden;}
 .conduct-eval-app .report-sign .col {width:45%;}
 .conduct-eval-app .report-sign .date-line {margin-bottom:26px;}
 
+
+/* =====================================================================
+   HOME DASHBOARD — Modern UI (Noto Sans Khmer, glass header, soft cards)
+   ===================================================================== */
+#tab-home, #tab-home * { font-family: 'Noto Sans Khmer', 'Kantumruy Pro', -apple-system, BlinkMacSystemFont, sans-serif; }
+#tab-home { max-width: 1080px; margin: 0 auto; padding-bottom: 1.5rem; }
+
+.home-hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 45%, #3b82f6 100%);
+    border-radius: 28px;
+    padding: 20px 22px 22px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 18px 40px -14px rgba(30, 58, 138, 0.5);
+}
+.home-hero::before {
+    content: ''; position: absolute; width: 280px; height: 280px; right: -80px; top: -110px;
+    background: radial-gradient(circle, rgba(255,255,255,0.24), transparent 70%); pointer-events: none;
+}
+.home-hero::after {
+    content: ''; position: absolute; width: 240px; height: 240px; left: -90px; bottom: -130px;
+    background: radial-gradient(circle, rgba(147,197,253,0.35), transparent 70%); pointer-events: none;
+}
+.home-hero > * { position: relative; z-index: 1; }
+
+.home-hero-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.home-logo { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.home-logo-icon {
+    width: 46px; height: 46px; flex-shrink: 0;
+    background: rgba(255,255,255,0.16);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.24);
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+}
+.home-logo-icon svg { width: 26px; height: 26px; fill: #fff; }
+.home-logo-text { min-width: 0; }
+.home-logo-text h1 { color: #fff; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.home-logo-text p { color: rgba(255,255,255,0.8); font-size: 11.5px; margin-top: 2px; }
+
+.home-logout-btn {
+    background: rgba(255,255,255,0.14);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; padding: 9px 15px; border-radius: 50px;
+    font-size: 12.5px; font-weight: 500; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+    transition: background .2s ease, transform .2s ease;
+}
+.home-logout-btn svg { width: 14px; height: 14px; }
+.home-logout-btn:hover { background: rgba(255,255,255,0.26); transform: scale(1.03); }
+.home-logout-btn:active { transform: scale(0.96); }
+
+.home-hero-body { margin-top: 22px; }
+.home-eyebrow { font-size: 12.5px; color: rgba(255,255,255,0.82); }
+.home-hero-body h2 { font-size: 21px; font-weight: 600; line-height: 1.5; margin-top: 4px; color: #fff; }
+
+.home-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px; }
+.home-stat {
+    background: rgba(255,255,255,0.14);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.24);
+    border-radius: 18px; padding: 14px 16px;
+}
+.home-stat-value { font-size: 24px; font-weight: 700; line-height: 1.25; color: #fff; }
+.home-stat-label { font-size: 12px; color: rgba(255,255,255,0.82); margin-top: 2px; }
+
+.home-group-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13.5px; font-weight: 600; color: var(--text-muted);
+    margin: 28px 4px 14px;
+}
+.home-group-title::before { content: ''; width: 4px; height: 16px; border-radius: 4px; background: #3b82f6; }
+
+.home-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+
+.home-card {
+    -webkit-appearance: none; appearance: none;
+    background: #fff; border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 22px; padding: 24px 14px 20px; color: var(--text);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    cursor: pointer; position: relative; overflow: hidden;
+    transition: transform .28s cubic-bezier(0.4,0,0.2,1), box-shadow .28s cubic-bezier(0.4,0,0.2,1);
+}
+.home-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3.5px;
+    background: var(--accent); opacity: 0; transition: opacity .25s;
+}
+.home-card-icon {
+    width: 58px; height: 58px; border-radius: 18px; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(145deg, var(--ibg1), var(--ibg2));
+    transition: transform .28s cubic-bezier(0.34,1.56,0.64,1);
+}
+.home-card-icon svg { width: 28px; height: 28px; fill: var(--ifill); }
+.home-card h3 { font-size: 14.5px; font-weight: 600; color: var(--text); margin-bottom: 5px; line-height: 1.45; }
+.home-card p { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
+
+@media (hover: hover) {
+    .home-card:hover { transform: translateY(-5px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+    .home-card:hover::before { opacity: 1; }
+    .home-card:hover .home-card-icon { transform: scale(1.1); }
+}
+.home-card:active { transform: translateY(-1px) scale(0.97); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+.home-card:active::before { opacity: 1; }
+.home-card:active .home-card-icon { transform: scale(1.06); }
+.home-card:focus-visible { outline: 3px solid rgba(59,130,246,0.45); outline-offset: 2px; }
+
+.home-card[hidden], .home-group[hidden] { display: none !important; }
+
+/* Soft icon palettes */
+.hc-violet { --accent:#8b5cf6; --ibg1:#f5f3ff; --ibg2:#ede9fe; --ifill:#7c3aed; }
+.hc-blue   { --accent:#3b82f6; --ibg1:#eff6ff; --ibg2:#dbeafe; --ifill:#2563eb; }
+.hc-green  { --accent:#10b981; --ibg1:#ecfdf5; --ibg2:#d1fae5; --ifill:#059669; }
+.hc-rose   { --accent:#f43f5e; --ibg1:#fff1f2; --ibg2:#ffe4e6; --ifill:#e11d48; }
+.hc-amber  { --accent:#f59e0b; --ibg1:#fffbeb; --ibg2:#fef3c7; --ifill:#d97706; }
+.hc-teal   { --accent:#14b8a6; --ibg1:#f0fdfa; --ibg2:#ccfbf1; --ifill:#0d9488; }
+.hc-cyan   { --accent:#06b6d4; --ibg1:#ecfeff; --ibg2:#cffafe; --ifill:#0891b2; }
+.hc-indigo { --accent:#6366f1; --ibg1:#eef2ff; --ibg2:#e0e7ff; --ifill:#4f46e5; }
+.hc-orange { --accent:#f97316; --ibg1:#fff7ed; --ibg2:#ffedd5; --ifill:#ea580c; }
+.hc-slate  { --accent:#64748b; --ibg1:#f8fafc; --ibg2:#e2e8f0; --ifill:#475569; }
+
+@media (max-width: 900px) {
+    .home-hero { border-radius: 24px; padding: 16px 16px 18px; }
+    .home-hero-body h2 { font-size: 18px; }
+    .home-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .home-stat { padding: 12px 14px; }
+    .home-stat-value { font-size: 21px; }
+    .home-cards { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .home-card { padding: 20px 10px 16px; border-radius: 20px; }
+    .home-card-icon { width: 52px; height: 52px; border-radius: 16px; margin-bottom: 12px; }
+    .home-card h3 { font-size: 13.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .home-card, .home-card-icon, .home-logout-btn { transition: none; }
+}
+
+/* =====================================================================
+   NAV MODES — dashboard-only home, module sidebar
+   ===================================================================== */
+body.mode-home .sidebar { display: none; }
+body.mode-home .main-content { margin-left: 0; width: 100%; }
+.mod-hidden { display: none !important; }
+.nav-home { background: #eef2ff; color: var(--primary); }
+.nav-home:hover { background: #e0e7ff; }
+.brand-icon { overflow: hidden; }
+.brand-icon.has-logo { background: #fff; box-shadow: 0 0 0 1px var(--border); }
+.brand-icon img, .home-logo-icon img, .login-logo img, .admin-logo-preview img, .admin-mini-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* Modules */
+.home-modules { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+.home-card.module { padding: 30px 18px 22px; border-radius: 26px; min-height: 196px; justify-content: flex-start; }
+.home-card.module .home-card-icon { width: 66px; height: 66px; border-radius: 21px; margin-bottom: 18px; }
+.home-card.module .home-card-icon svg { width: 32px; height: 32px; }
+.home-card.module h3 { font-size: 16px; }
+.home-card.module p { font-size: 12px; }
+.home-card-go { margin-top: auto; padding-top: 16px; font-size: 12px; font-weight: 600; color: var(--ifill); display: inline-flex; align-items: center; gap: 4px; }
+.home-card-go::after { content: '›'; font-size: 18px; line-height: 1; transition: transform .25s; }
+@media (hover: hover) { .home-card:hover .home-card-go::after { transform: translateX(4px); } }
+.home-logo-icon { width: 54px; height: 54px; border-radius: 16px; overflow: hidden; }
+.home-logo-icon.has-logo { background: rgba(255,255,255,0.94); padding: 4px; }
+.home-logo-text h1 { font-size: 18px; }
+
+/* Login */
+#loginModal, #loginModal * { font-family: 'Noto Sans Khmer', 'Kantumruy Pro', -apple-system, BlinkMacSystemFont, sans-serif; }
+.login-overlay {
+    position: fixed; inset: 0; z-index: 10000; padding: 16px; overflow-y: auto;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%);
+}
+.login-card {
+    background: #fff; border-radius: 28px; padding: 30px 26px 26px; width: 100%; max-width: 400px;
+    text-align: center; box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5); margin: auto;
+}
+.login-logo {
+    width: 76px; height: 76px; margin: 0 auto 14px; border-radius: 22px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; font-size: 2.2rem;
+    background: linear-gradient(145deg, #eff6ff, #dbeafe);
+}
+.login-logo.has-logo { background: #fff; border: 1px solid var(--border); padding: 4px; }
+.login-card h2 { font-size: 19px; font-weight: 700; color: #1e293b; line-height: 1.4; }
+.login-sub { font-size: 13px; color: #64748b; margin: 4px 0 20px; }
+.login-form { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.login-class-group { display: none; }
+.login-submit { margin-top: 8px; }
+
+/* Admin tab */
+.admin-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.admin-card { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 22px; box-shadow: var(--shadow-md); }
+.admin-card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 18px; }
+.admin-logo-row { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; flex-wrap: wrap; }
+.admin-logo-preview {
+    width: 104px; height: 104px; border-radius: 26px; overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 2.6rem;
+    background: linear-gradient(145deg, #eff6ff, #dbeafe); border: 1px solid var(--border);
+}
+.admin-logo-preview.has-logo { background: #fff; padding: 6px; }
+.admin-logo-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.admin-file-input { display: none !important; }
+.admin-upload-btn, .admin-ghost-btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 12px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s ease; border: 1px solid transparent;
+}
+.admin-upload-btn { background: #eef2ff; color: var(--primary) !important; }
+.admin-upload-btn:hover { background: #e0e7ff; }
+.admin-ghost-btn { background: #fff; color: #e11d48; border-color: #fecdd3; }
+.admin-ghost-btn:hover { background: #fff1f2; }
+.admin-hint { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+.admin-hint-block { margin-top: 14px; line-height: 1.6; }
+.admin-name-group { margin-bottom: 18px; }
+.admin-status { margin-top: 12px; font-size: 13px; font-weight: 600; min-height: 1.2em; }
+.admin-status.ok { color: #059669; }
+.admin-status.err { color: #dc2626; }
+.admin-mini-hero {
+    display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 20px; color: #fff;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 45%, #3b82f6 100%);
+}
+.admin-mini-logo {
+    width: 48px; height: 48px; border-radius: 14px; overflow: hidden; flex-shrink: 0; font-size: 1.4rem;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.24);
+}
+.admin-mini-logo.has-logo { background: rgba(255,255,255,0.94); padding: 4px; }
+.admin-mini-name { font-size: 16px; font-weight: 600; line-height: 1.35; }
+.admin-mini-sub { font-size: 11.5px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+#tab-admin, #tab-admin * { font-family: 'Noto Sans Khmer', 'Kantumruy Pro', sans-serif; }
+
+@media (max-width: 900px) {
+    .admin-grid { grid-template-columns: 1fr; }
+    .home-modules { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .home-card.module { padding: 22px 12px 16px; min-height: 170px; border-radius: 22px; }
+    .home-card.module .home-card-icon { width: 56px; height: 56px; border-radius: 18px; margin-bottom: 14px; }
+    .home-card.module h3 { font-size: 14.5px; }
+    .nav-home { white-space: nowrap; }
+    .brand-icon { width: 34px; height: 34px; font-size: 1rem; }
+    .sidebar-brand h2 { display: none; }
+}
+
 </style>
 </head>
-<body>
+<body class="mode-home">
 
 <!-- Login Modal Overlay -->
-<div id="loginModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.95); display:flex; align-items:center; justify-content:center; z-index:10000;">
-    <div style="background:white; padding:2rem; border-radius:16px; width:90%; max-width:400px; text-align:center; box-shadow:0 20px 25px -5px rgba(0,0,0,0.3);">
-        <h2 style="margin-bottom:0.5rem; color:#1e293b;">🏫 ប្រព័ន្ធគ្រប់គ្រងសាលារៀន</h2>
-        <p style="font-size:0.85rem; color:#64748b; margin-bottom:1.5rem;">សូមជ្រើសរើសតួនាទី និងបញ្ចូលលេខកូដសម្ងាត់</p>
-        
-        <div style="display:flex; flex-direction:column; gap:12px; text-align:left;">
+<div id="loginModal" class="login-overlay">
+    <div class="login-card">
+        <div class="login-logo" id="login-logo">🏫</div>
+        <h2 id="login-school-name">សាលាសកល១</h2>
+        <p class="login-sub">ប្រព័ន្ធគ្រប់គ្រងសាលារៀន</p>
+
+        <div class="login-form">
             <div class="form-group">
                 <label>តួនាទី (Role)៖</label>
                 <select id="modalRole" onchange="toggleTeacherClassInput()">
@@ -666,8 +908,8 @@ body * {visibility:hidden;}
                     <option value="teacher">3. គ្រូបន្ទុកថ្នាក់ (Teacher)</option>
                 </select>
             </div>
-            
-            <div class="form-group" id="teacherClassGroup" style="display:none;">
+
+            <div class="form-group login-class-group" id="teacherClassGroup">
                 <label>ថ្នាក់ដែលទទួលបន្ទុក៖</label>
                 <select id="modalClass">
                     <option value="7A">ថ្នាក់ 7A</option>
@@ -684,7 +926,7 @@ body * {visibility:hidden;}
                 <input type="password" id="modalPin" placeholder="បញ្ចូលលេខកូដសម្ងាត់...">
             </div>
 
-            <button type="button" id="loginBtn" class="btn-action" style="margin-top:10px;" onclick="handleLogin()">🔑 ចូលប្រើប្រាស់</button>
+            <button type="button" id="loginBtn" class="btn-action login-submit" onclick="handleLogin()">🔑 ចូលប្រើប្រាស់</button>
         </div>
     </div>
 </div>
@@ -695,37 +937,144 @@ body * {visibility:hidden;}
     <button id="btn-skip" class="btn-action btn-warning" style="display:none; width:auto;" onclick="hideLoading()">⚠️ រំលង (ចូលប្រើប្រាស់ដោយគ្មាន Internet)</button>
 </div>
 
-<!-- Navigation Sidebar -->
+<!-- Navigation Sidebar (module-aware: shows only the opened module) -->
 <div class="sidebar">
     <div class="sidebar-brand">
-        <div class="brand-icon">🏫</div>
-        <h2>ប្រព័ន្ធគ្រប់គ្រងសាលា</h2>
+        <div class="brand-icon" id="brand-icon">🏫</div>
+        <h2 id="brand-name">សាលាសកល១</h2>
     </div>
-    
-    <div class="sidebar-category">វត្តមានសិស្ស</div>
-    <button class="nav-btn active" onclick="switchTab('tab-daily', this)">📝 បញ្ចូលវត្តមាន</button>
-    <button class="nav-btn" onclick="switchTab('tab-monthly', this)">📊 បញ្ជីប្រចាំខែ</button>
-    <button class="nav-btn" onclick="switchTab('tab-search', this)">🔍 ស្វែងរកវត្តមាន</button>
-    <button class="nav-btn" id="btn-nav-students-manage" onclick="switchTab('tab-students-manage', this)">⚙️ គ្រប់គ្រងបញ្ជីឈ្មោះ</button>
 
-    <div class="sidebar-category">បន្ទុកថ្នាក់</div>
-    <button class="nav-btn" onclick="switchTab('tab-contacts', this)">🎓 ទំនាក់ទំនងអាណាព្យាបាល</button>
-    <button class="nav-btn" id="btn-nav-homeroom" onclick="switchTab('tab-homeroom', this)">👨‍🏫 គ្រូបន្ទុកថ្នាក់</button>
-    <button class="nav-btn" onclick="switchTab('tab-subject-teachers', this)">📚 គ្រូបង្រៀន</button>
-    <button class="nav-btn" onclick="switchTab('tab-timetable', this)">📅 កាលវិភាគ</button>
+    <button class="nav-btn nav-home" onclick="switchTab('tab-home', this)">🏠 ត្រឡប់ទៅទំព័រដើម</button>
 
-    <div class="sidebar-category">ប្រព័ន្ធបន្ថែម</div>
-    <button class="nav-btn" id="btn-nav-conduct-eval" onclick="switchTab('tab-conduct-eval', this)">🌟 វាយតម្លៃឥរិយាបថ/សមត្ថភាព</button>
+    <div class="sidebar-category" data-module="attendance">វត្តមានសិស្ស</div>
+    <button class="nav-btn" data-module="attendance" onclick="switchTab('tab-daily', this)">📝 បញ្ចូលវត្តមាន</button>
+    <button class="nav-btn" data-module="attendance" onclick="switchTab('tab-monthly', this)">📊 បញ្ជីប្រចាំខែ</button>
+    <button class="nav-btn" data-module="attendance" onclick="switchTab('tab-search', this)">🔍 ស្វែងរកវត្តមាន</button>
+    <button class="nav-btn" data-module="attendance" id="btn-nav-students-manage" onclick="switchTab('tab-students-manage', this)">⚙️ គ្រប់គ្រងបញ្ជីឈ្មោះ</button>
 
-    <button class="nav-btn admin-only" id="btn-nav-data-entry" onclick="switchTab('tab-data-entry', this)">📝 បំពេញទិន្នន័យ</button>
+    <div class="sidebar-category" data-module="class">បន្ទុកថ្នាក់</div>
+    <button class="nav-btn" data-module="class" onclick="switchTab('tab-contacts', this)">🎓 ទំនាក់ទំនងអាណាព្យាបាល</button>
+    <button class="nav-btn" data-module="class" id="btn-nav-homeroom" onclick="switchTab('tab-homeroom', this)">👨‍🏫 គ្រូបន្ទុកថ្នាក់</button>
+    <button class="nav-btn" data-module="class" onclick="switchTab('tab-subject-teachers', this)">📚 គ្រូបង្រៀន</button>
+    <button class="nav-btn" data-module="class" onclick="switchTab('tab-timetable', this)">📅 កាលវិភាគ</button>
+
+    <div class="sidebar-category" data-module="extra">ប្រព័ន្ធបន្ថែម</div>
+    <button class="nav-btn" data-module="extra" id="btn-nav-conduct-eval" onclick="switchTab('tab-conduct-eval', this)">🌟 វាយតម្លៃឥរិយាបថ/សមត្ថភាព</button>
+
+    <div class="sidebar-category admin-only" data-module="admin">Admin</div>
+    <button class="nav-btn admin-only" data-module="admin" id="btn-nav-admin" onclick="switchTab('tab-admin', this)">🏫 ព័ត៌មានសាលា (Logo &amp; ឈ្មោះ)</button>
+    <button class="nav-btn admin-only" data-module="admin" id="btn-nav-data-entry" onclick="switchTab('tab-data-entry', this)">📝 បំពេញទិន្នន័យ</button>
 </div>
 
 <!-- Main Content Area -->
 <div class="main-content">
     <div id="statusContainer"></div>
 
+    <!-- HOME DASHBOARD (Modern UI) -->
+    <div id="tab-home" class="section active">
+        <div class="home-hero">
+            <div class="home-hero-top">
+                <div class="home-logo">
+                    <div class="home-logo-icon" id="home-logo-icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+                    </div>
+                    <div class="home-logo-text">
+                        <h1 id="home-school-name">សាលាសកល១</h1>
+                        <p id="home-role-label">ប្រព័ន្ធគ្រប់គ្រងសាលារៀន</p>
+                    </div>
+                </div>
+                <button type="button" class="home-logout-btn" onclick="handleLogout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    ចាកចេញ
+                </button>
+            </div>
+
+            <div class="home-hero-body">
+                <div class="home-eyebrow" id="home-greeting">សូមស្វាគមន៍</div>
+                <h2>សូមស្វាគមន៍មកកាន់<br>ប្រព័ន្ធគ្រប់គ្រងសាលារៀន</h2>
+                <div class="home-eyebrow" id="home-date"></div>
+            </div>
+
+            <div class="home-stats">
+                <div class="home-stat"><div class="home-stat-value" id="home-stat-students">0</div><div class="home-stat-label">សិស្សកំពុងរៀន</div></div>
+                <div class="home-stat"><div class="home-stat-value" id="home-stat-classes">0</div><div class="home-stat-label" id="home-stat-classes-label">ថ្នាក់រៀន</div></div>
+                <div class="home-stat"><div class="home-stat-value" id="home-stat-teachers">0</div><div class="home-stat-label">គ្រូបង្រៀន</div></div>
+                <div class="home-stat"><div class="home-stat-value" id="home-stat-attendance">—</div><div class="home-stat-label">វត្តមានថ្ងៃនេះ</div></div>
+            </div>
+        </div>
+
+        <div class="home-group-title">ជ្រើសរើសមុខងារ</div>
+        <div class="home-cards home-modules">
+            <button type="button" class="home-card module hc-violet" data-module="attendance" onclick="openModule('attendance')">
+                <div class="home-card-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/><path d="M16.59 7.58L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/></svg></div>
+                <h3>វត្តមានសិស្ស</h3>
+                <p>បញ្ចូលវត្តមាន បញ្ជីប្រចាំខែ និងស្វែងរក</p>
+                <span class="home-card-go"><span class="home-card-count"></span></span>
+            </button>
+            <button type="button" class="home-card module hc-green" data-module="class" onclick="openModule('class')">
+                <div class="home-card-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+                <h3>បន្ទុកថ្នាក់</h3>
+                <p>គ្រូ អាណាព្យាបាល និងកាលវិភាគ</p>
+                <span class="home-card-go"><span class="home-card-count"></span></span>
+            </button>
+            <button type="button" class="home-card module hc-orange" data-module="extra" onclick="openModule('extra')">
+                <div class="home-card-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+                <h3>វាយតម្លៃសិស្ស</h3>
+                <p>ឥរិយាបថ និងសមត្ថភាព</p>
+                <span class="home-card-go"><span class="home-card-count"></span></span>
+            </button>
+            <button type="button" class="home-card module hc-rose" data-module="admin" onclick="openModule('admin')">
+                <div class="home-card-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg></div>
+                <h3>Admin</h3>
+                <p>ព័ត៌មានសាលា Logo និងទិន្នន័យ</p>
+                <span class="home-card-go"><span class="home-card-count"></span></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- TAB ADMIN: School identity (Logo + Name) -->
+    <div id="tab-admin" class="section">
+        <div class="section-header"><h3 class="section-title">🏫 ព័ត៌មានសាលា (Admin)</h3></div>
+
+        <div class="admin-grid">
+            <div class="admin-card">
+                <div class="admin-card-title">Logo និងឈ្មោះសាលា</div>
+
+                <div class="admin-logo-row">
+                    <div class="admin-logo-preview" id="admin-logo-preview">🏫</div>
+                    <div class="admin-logo-actions">
+                        <label class="admin-upload-btn" for="admin-logo-input">📷 ជ្រើសរើសរូប Logo</label>
+                        <input type="file" id="admin-logo-input" class="admin-file-input" accept="image/*" onchange="handleLogoFile(this)">
+                        <button type="button" class="admin-ghost-btn" onclick="removeSchoolLogo()">🗑️ លុប Logo</button>
+                        <div class="admin-hint">PNG ឬ JPG ប្រព័ន្ធនឹងបង្រួមរូបស្វ័យប្រវត្តិ</div>
+                    </div>
+                </div>
+
+                <div class="form-group admin-name-group">
+                    <label for="admin-school-name">ឈ្មោះសាលា</label>
+                    <input type="text" id="admin-school-name" placeholder="ឧ. វិទ្យាល័យ ..." oninput="updateAdminPreview()">
+                </div>
+
+                <button type="button" class="btn-action" id="admin-save-btn" onclick="saveSchoolSettings()">💾 រក្សាទុក</button>
+                <div class="admin-status" id="admin-status"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-title">មើលជាមុន</div>
+                <div class="admin-mini-hero">
+                    <div class="admin-mini-logo" id="admin-mini-logo">🏫</div>
+                    <div class="admin-mini-text">
+                        <div class="admin-mini-name" id="admin-mini-name">សាលាសកល១</div>
+                        <div class="admin-mini-sub">ប្រព័ន្ធគ្រប់គ្រងសាលារៀន</div>
+                    </div>
+                </div>
+                <div class="admin-hint admin-hint-block">Logo និងឈ្មោះនេះនឹងបង្ហាញនៅទំព័រដើម, Sidebar និងទំព័រចូលប្រើ (Login)។</div>
+            </div>
+        </div>
+    </div>
+
     <!-- TAB 1: DAILY ENTRY -->
-    <div id="tab-daily" class="section active">
+    <div id="tab-daily" class="section">
         <div class="section-header"><h3 class="section-title">បញ្ចូលវត្តមានសិស្សប្រចាំថ្ងៃ</h3></div>
         <div class="control-panel">
             <div class="form-group">
@@ -1595,6 +1944,7 @@ const firebaseConfig = {
             if (dataEntryNavBtn) dataEntryNavBtn.style.display = 'none';
             if (dataEntryCat) dataEntryCat.style.display = 'none';
         }
+        renderHome();
     }
 
     // --- LOGIN SYSTEM FUNCTIONS ---
@@ -1685,6 +2035,7 @@ const firebaseConfig = {
         if (dataCat) dataCat.style.display = isAdmin ? 'block' : 'none';
         const dataBtn = document.getElementById('btn-nav-data-entry');
         if (dataBtn) dataBtn.style.display = (isAdmin && window.innerWidth > 900) ? 'flex' : 'none';
+        renderHome();
     }
 
     function toggleAdminMode() {
@@ -1814,9 +2165,15 @@ const firebaseConfig = {
                 globalData.timetable = Array.isArray(data.timetable) ? data.timetable : Object.values(data.timetable);
             }
             
+            if (data.settings && data.settings.school) {
+                schoolInfo = { name: data.settings.school.name || '', logo: data.settings.school.logo || '' };
+                saveBrandingCache();
+                applyBranding();
+            }
             hideLoading();
             populateStudentDropdown();
             loadDailyData();
+            renderHome();
             // Refresh open views if needed
             if (document.getElementById('tab-data-entry')?.classList.contains('active')) {
                 loadDataEntryForms();
@@ -1839,11 +2196,279 @@ const firebaseConfig = {
         });
     };
 
+    // ====================================================================
+    // HOME DASHBOARD — render stats, role label, card visibility, navigation
+    // ====================================================================
+    function goTab(tabId) {
+        const btn = document.querySelector(".nav-btn[onclick*=\"'" + tabId + "'\"]");
+        switchTab(tabId, btn);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function handleLogout() {
+        if (!confirm('តើអ្នកចង់ចាកចេញពីប្រព័ន្ធមែនទេ?')) return;
+        const pinEl = document.getElementById('modalPin');
+        if (pinEl) pinEl.value = '';
+        toggleAdminModeForce(false);
+        goTab('tab-home');
+        const modal = document.getElementById('loginModal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function renderHome() {
+        const home = document.getElementById('tab-home');
+        if (!home) return;
+        try {
+            // Role label
+            const roleNames = { admin: 'Admin', director: 'នាយក' };
+            const roleText = userRole === 'teacher'
+                ? 'គ្រូបន្ទុកថ្នាក់ ' + assignedClass
+                : (roleNames[userRole] || userRole);
+            const roleEl = document.getElementById('home-role-label');
+            if (roleEl) roleEl.textContent = 'ប្រព័ន្ធគ្រប់គ្រងសាលារៀន (' + roleText + ')';
+
+            // Greeting + date
+            const now = new Date();
+            const h = now.getHours();
+            const greet = h < 12 ? 'អរុណសួស្តី' : (h < 17 ? 'ទិវាសួស្តី' : (h < 19 ? 'សាយណ្ហសួស្តី' : 'រាត្រីសួស្តី'));
+            const gEl = document.getElementById('home-greeting');
+            if (gEl) gEl.textContent = '👋 ' + greet;
+            const dEl = document.getElementById('home-date');
+            if (dEl) dEl.textContent = 'ថ្ងៃ' + khmerDays[now.getDay()] + ' ទី' + now.getDate() + ' ខែ' + khmerMonths[now.getMonth()] + ' ឆ្នាំ' + now.getFullYear();
+
+            // Stats (from Firebase data already synced into students / attendanceData / globalData)
+            const isTeacher = userRole === 'teacher';
+            let list = getUnifiedStudents().filter(isStudentActive);
+            if (isTeacher) list = list.filter(s => getStudentClass(s) === assignedClass);
+
+            const classSet = new Set(list.map(s => getStudentClass(s)).filter(Boolean));
+            const teachers = Array.isArray(globalData.masterTeachers) ? globalData.masterTeachers.length : 0;
+
+            const todayKey = new Date().toISOString().slice(0, 10); // same date source as #daily-date
+            let p = 0, l = 0, a = 0;
+            Object.keys(attendanceData || {}).forEach(k => {
+                if (!k.endsWith('_' + todayKey)) return;
+                if (isTeacher && k.indexOf('_' + assignedClass + '_') === -1) return;
+                Object.values(attendanceData[k] || {}).forEach(v => {
+                    if (v === 'P') p++; else if (v === 'L') l++; else if (v === 'A') a++;
+                });
+            });
+            const total = p + l + a;
+
+            const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            setText('home-stat-students', list.length);
+            setText('home-stat-classes', isTeacher ? assignedClass : classSet.size);
+            setText('home-stat-classes-label', isTeacher ? 'ថ្នាក់ទទួលបន្ទុក' : 'ថ្នាក់រៀន');
+            setText('home-stat-teachers', teachers);
+            setText('home-stat-attendance', total ? Math.round((p / total) * 100) + '%' : '—');
+
+            // Show only modules the current role can access (mirrors sidebar permissions)
+            home.querySelectorAll('.home-card[data-module]').forEach(card => {
+                const n = Array.from(document.querySelectorAll('.sidebar .nav-btn[data-module="' + card.dataset.module + '"]')).filter(navBtnAllowed).length;
+                card.hidden = n === 0;
+                const cnt = card.querySelector('.home-card-count');
+                if (cnt) cnt.textContent = n + ' មុខងារ';
+            });
+        } catch (e) {
+            console.error('renderHome error:', e);
+        }
+    }
+
+    let _homeResizeTimer = null;
+    window.addEventListener('resize', () => {
+        clearTimeout(_homeResizeTimer);
+        _homeResizeTimer = setTimeout(renderHome, 200);
+    });
+
+    // ====================================================================
+    // NAVIGATION MODES — dashboard-only home / module sidebar
+    // ====================================================================
+    function navBtnAllowed(btn) {
+        if (!btn) return false;
+        if (btn.style.display === 'none') return false;
+        if (btn.classList.contains('admin-only') && btn.style.display !== 'flex') return false;
+        if (btn.id === 'btn-nav-data-entry' && window.innerWidth <= 900) return false;
+        return true;
+    }
+
+    function moduleOfTab(tabId) {
+        const b = document.querySelector(".sidebar .nav-btn[onclick*=\"'" + tabId + "'\"]");
+        return b ? b.dataset.module : null;
+    }
+
+    function applyNavMode(tabId) {
+        const body = document.body;
+        if (tabId === 'tab-home') { body.classList.add('mode-home'); return; }
+        body.classList.remove('mode-home');
+        const mod = moduleOfTab(tabId);
+        document.querySelectorAll('.sidebar [data-module]').forEach(el => {
+            el.classList.toggle('mod-hidden', !!mod && el.dataset.module !== mod);
+        });
+    }
+
+    function openModule(mod) {
+        const btns = Array.from(document.querySelectorAll('.sidebar .nav-btn[data-module="' + mod + '"]')).filter(navBtnAllowed);
+        if (!btns.length) return;
+        const m = (btns[0].getAttribute('onclick') || '').match(/switchTab\('([^']+)'/);
+        if (m) goTab(m[1]);
+    }
+
+    // ====================================================================
+    // SCHOOL BRANDING (Logo + Name) — stored in Firebase: settings/school
+    // ====================================================================
+    const DEFAULT_SCHOOL_NAME = 'សាលាសកល១';
+    let schoolInfo = { name: '', logo: '' };
+    let adminLogoDraft = '';
+
+    function isValidLogo(l) {
+        return typeof l === 'string' && /^data:image\/(png|jpeg|webp|gif);base64,/.test(l);
+    }
+
+    function setLogoEl(el, logo) {
+        if (!el) return;
+        if (el.dataset.def === undefined) el.dataset.def = el.innerHTML;
+        if (isValidLogo(logo)) {
+            el.classList.add('has-logo');
+            el.textContent = '';
+            const img = new Image();
+            img.alt = 'Logo';
+            img.src = logo;
+            el.appendChild(img);
+        } else {
+            el.classList.remove('has-logo');
+            el.innerHTML = el.dataset.def;
+        }
+    }
+
+    function applyBranding() {
+        const name = (schoolInfo.name || '').trim() || DEFAULT_SCHOOL_NAME;
+        ['home-school-name', 'brand-name', 'login-school-name'].forEach(id => {
+            const e = document.getElementById(id);
+            if (e) e.textContent = name;
+        });
+        ['home-logo-icon', 'brand-icon', 'login-logo'].forEach(id => setLogoEl(document.getElementById(id), schoolInfo.logo));
+        document.title = name + ' | ប្រព័ន្ធគ្រប់គ្រងសាលារៀន';
+    }
+
+    function loadBrandingCache() {
+        try {
+            const c = JSON.parse(localStorage.getItem('schoolBranding') || 'null');
+            if (c) schoolInfo = { name: c.name || '', logo: c.logo || '' };
+        } catch (e) { /* storage may be unavailable */ }
+    }
+    function saveBrandingCache() {
+        try { localStorage.setItem('schoolBranding', JSON.stringify(schoolInfo)); } catch (e) { /* ignore */ }
+    }
+
+    function setAdminStatus(msg, type) {
+        const el = document.getElementById('admin-status');
+        if (!el) return;
+        el.textContent = msg || '';
+        el.className = 'admin-status' + (type ? ' ' + type : '');
+    }
+
+    function updateAdminPreview() {
+        const inp = document.getElementById('admin-school-name');
+        const name = ((inp && inp.value) || '').trim() || DEFAULT_SCHOOL_NAME;
+        const nEl = document.getElementById('admin-mini-name');
+        if (nEl) nEl.textContent = name;
+        setLogoEl(document.getElementById('admin-logo-preview'), adminLogoDraft);
+        setLogoEl(document.getElementById('admin-mini-logo'), adminLogoDraft);
+    }
+
+    function renderAdminSettings() {
+        adminLogoDraft = schoolInfo.logo || '';
+        const inp = document.getElementById('admin-school-name');
+        if (inp) inp.value = schoolInfo.name || '';
+        setAdminStatus('');
+        updateAdminPreview();
+    }
+
+    function resizeLogo(img, type) {
+        const iw = img.naturalWidth || 256, ih = img.naturalHeight || 256;
+        const isJpeg = type === 'image/jpeg';
+        const sizes = [256, 192, 128];
+        let out = '';
+        for (const max of sizes) {
+            const scale = Math.min(1, max / Math.max(iw, ih));
+            const w = Math.max(1, Math.round(iw * scale)), h = Math.max(1, Math.round(ih * scale));
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            const ctx = c.getContext('2d');
+            if (isJpeg) { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h); }
+            ctx.drawImage(img, 0, 0, w, h);
+            out = isJpeg ? c.toDataURL('image/jpeg', 0.88) : c.toDataURL('image/png');
+            if (out.length <= 200000) break;
+        }
+        return out;
+    }
+
+    function handleLogoFile(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        if (!file.type || file.type.indexOf('image/') !== 0) {
+            setAdminStatus('❌ សូមជ្រើសរើសឯកសាររូបភាព', 'err');
+            input.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                adminLogoDraft = resizeLogo(img, file.type);
+                updateAdminPreview();
+                setAdminStatus('រូបភាពរួចរាល់ — ចុច "រក្សាទុក" ដើម្បីបញ្ជាក់', '');
+            };
+            img.onerror = () => setAdminStatus('❌ មិនអាចអានរូបភាពនេះបានទេ', 'err');
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+        input.value = '';
+    }
+
+    function removeSchoolLogo() {
+        adminLogoDraft = '';
+        updateAdminPreview();
+        setAdminStatus('Logo ត្រូវបានលុប — ចុច "រក្សាទុក" ដើម្បីបញ្ជាក់', '');
+    }
+
+    function saveSchoolSettings() {
+        if (!db) { setAdminStatus('❌ មិនទាន់ភ្ជាប់ទៅ Firebase!', 'err'); return; }
+        if (!isAdmin) { setAdminStatus('🔒 សម្រាប់តែ Admin ប៉ុណ្ណោះ', 'err'); return; }
+        const name = ((document.getElementById('admin-school-name') || {}).value || '').trim();
+        const btn = document.getElementById('admin-save-btn');
+        const original = btn.innerHTML;
+        btn.innerHTML = '⏳ កំពុងរក្សាទុក...';
+        btn.disabled = true;
+        const stamp = (typeof firebase !== 'undefined' && firebase.database && firebase.database.ServerValue)
+            ? firebase.database.ServerValue.TIMESTAMP : Date.now();
+        db.ref('settings/school').set({ name: name, logo: adminLogoDraft || '', updatedAt: stamp }, function (err) {
+            btn.innerHTML = original;
+            btn.disabled = false;
+            if (err) {
+                setAdminStatus('❌ រក្សាទុកមិនបាន៖ ' + err.message, 'err');
+            } else {
+                schoolInfo = { name: name, logo: adminLogoDraft || '' };
+                saveBrandingCache();
+                applyBranding();
+                setAdminStatus('✅ រក្សាទុកបានជោគជ័យ!', 'ok');
+            }
+        });
+    }
+
+    loadBrandingCache();
+    applyBranding();
+    (function () {
+        const pin = document.getElementById('modalPin');
+        if (pin) pin.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+    })();
+
     function switchTab(tabId, btn) {
         if (tabId === 'tab-data-entry' && window.innerWidth <= 900) {
             alert('📵 ទំព័រ "បំពេញទិន្នន័យ" អាចប្រើបានតែលើកុំព្យូទ័រប៉ុណ្ណោះ។ សូមប្រើកុំព្យូទ័រដើម្បីបំពេញទិន្នន័យ។');
             return;
         }
+        applyNavMode(tabId);
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         
@@ -1851,7 +2476,9 @@ const firebaseConfig = {
         if (targetSection) targetSection.classList.add('active');
         if (btn) btn.classList.add('active');
 
-        if(tabId === 'tab-daily') loadDailyData();
+        if(tabId === 'tab-home') renderHome();
+        else if(tabId === 'tab-admin') renderAdminSettings();
+        else if(tabId === 'tab-daily') loadDailyData();
         else if(tabId === 'tab-monthly') renderMonthlySheet();
         else if(tabId === 'tab-search') populateStudentSelect();
         else if(tabId === 'tab-students-manage') renderStudentManagement();
