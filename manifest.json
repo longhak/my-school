@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "ប្រព័ន្ធគ្រប់គ្រងសាលារៀន",
+  "short_name": "SOTIP",
+  "description": "ប្រព័ន្ធគ្រប់គ្រងសាលារៀន៖ វត្តមានសិស្ស បន្ទុកថ្នាក់ កាលវិភាគ និងការវាយតម្លៃ",
+  "lang": "km",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "sotip1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "sotip2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

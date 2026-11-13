@@ -1850,7 +1850,7 @@ const firebaseConfig = {
   projectId: "sotip-system",
   storageBucket: "sotip-system.firebasestorage.app",
   messagingSenderId: "854683691449",
-  appId: "1:854683691449:web:077df2e0ea512045856e68"
+  appId: "1:854683691449:web:077df2e0ea512045856e68"""
 };
 
     let db = null;
@@ -3722,34 +3722,28 @@ function renderStudents() {
     }
 
 
+    // បញ្ជីមុខវិជ្ជាស្តង់ដារ (ប្រើពេលគ្មានបញ្ជីពី Google Sheet)
+    const DEFAULT_SUBJECT_NAMES = ['ភាសាខ្មែរ', 'គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'អង់គ្លេស', 'កុំព្យូទ័រ', 'សីលធម៌', 'កីឡា', 'អប់រំសុខភាព','បំណិនជីវិត'];
+
     function getSubjectNameList() {
-        const subjects = globalData.subjects || globalData.Subjects || [];
-        const names = [];
         const seen = new Set();
+        const names = [];
+        const add = raw => {
+            const n = (raw || '').toString().replace(/\s*\(ថ្នាក់\s*[7-9][AB]\)/gi, '').trim();
+            if (n && !seen.has(n)) { seen.add(n); names.push(n); }
+        };
 
-        subjects.forEach(s => {
-            const n = (s.SubjectName || s['SubjectName'] || s['មុខវិជ្ជា'] || s.name || '').toString().trim();
-            if (n && !seen.has(n)) {
-                seen.add(n);
-                names.push(n);
-            }
-        });
+        // 1) បញ្ជីមុខវិជ្ជាផ្លូវការពី Google Sheet (បើមាន)
+        const subjects = globalData.subjects || globalData.Subjects || [];
+        subjects.forEach(s => add(s.SubjectName || s['SubjectName'] || s['មុខវិជ្ជា'] || s.name));
+        const hasOfficialList = names.length > 0;
 
-        // Fallback: extract unique subject names from existing subjectTeachers / assignments
-        if (names.length === 0) {
-            (globalData.subjectTeachers || []).forEach(t => {
-                let n = (t['មុខវិជ្ជាបង្រៀន'] || '').toString().replace(/\s*\(ថ្នាក់\s*[7-9][AB]\)/gi, '').trim();
-                if (n && !seen.has(n)) {
-                    seen.add(n);
-                    names.push(n);
-                }
-            });
-        }
+        // 2) មុខវិជ្ជាដែលបានកំណត់ឲ្យគ្រូរួចហើយ (រក្សាទុកក្នុង Firebase)
+        (globalData.subjectTeachers || []).forEach(t => add(t['មុខវិជ្ជាបង្រៀន']));
 
-        // Default list if still empty
-        if (names.length === 0) {
-            return ['ភាសាខ្មែរ', 'គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'អង់គ្លេស', 'កុំព្យូទ័រ', 'សីលធម៌', 'កីឡា', 'សិល្បៈ'];
-        }
+        // 3) បើគ្មានបញ្ជីផ្លូវការ ត្រូវបន្ថែមបញ្ជីស្តង់ដារ ដើម្បីកុំឲ្យបង្ហាញតែមុខវិជ្ជាមួយចំនួនតូច
+        if (!hasOfficialList) DEFAULT_SUBJECT_NAMES.forEach(add);
+
         return names.sort((a, b) => a.localeCompare(b, 'km'));
     }
 
