@@ -20,9 +20,13 @@
     <!-- Noto Sans Khmer (Home Dashboard) -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- PWA Settings -->
-    <meta name="theme-color" content="#4f46e5">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/6614/6614679.png">
+<!-- PWA Settings -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e3a8a">
+<link rel="apple-touch-icon" href="sotip.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SOTIP">
 
     <style>
         :root {
@@ -1850,7 +1854,7 @@ const firebaseConfig = {
   projectId: "sotip-system",
   storageBucket: "sotip-system.firebasestorage.app",
   messagingSenderId: "854683691449",
-  appId: "1:854683691449:web:077df2e0ea512045856e68"""
+  appId: "1:854683691449:web:077df2e0ea512045856e68"
 };
 
     let db = null;
@@ -5205,6 +5209,12 @@ function initConductEval(){
         </div>
     </div>
 </div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(console.error));
+}
+</script>
 
 </body>
 </html>
