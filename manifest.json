@@ -1,0 +1,16 @@
+{
+  "name": "SCHOOL MANAGEMENT SYSTEM",
+  "short_name": "SCHOOL MANAGEMENT SYSTEM",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#132e53",
+  "theme_color": "#132e53",
+  "icons": [
+    {
+      "src": "./sotip.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
