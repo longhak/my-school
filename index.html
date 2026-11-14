@@ -20,13 +20,9 @@
     <!-- Noto Sans Khmer (Home Dashboard) -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<!-- PWA Settings -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1e3a8a">
-<link rel="apple-touch-icon" href="sotip.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="SOTIP">
+    <!-- PWA Settings -->
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/6614/6614679.png">
 
     <style>
         :root {
@@ -892,6 +888,19 @@ body.mode-home .main-content { margin-left: 0; width: 100%; }
     .sidebar-brand h2 { display: none; }
 }
 
+/* Admin: database tools */
+.admin-wide { grid-column: 1 / -1; }
+.admin-btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.admin-hint-top { margin: -8px 0 14px; line-height: 1.6; }
+.admin-ghost-btn.neutral { color: var(--primary); border-color: #c7d2fe; }
+.admin-ghost-btn.neutral:hover { background: #eef2ff; }
+.admin-report {
+    display: none; margin-top: 16px; white-space: pre-wrap; word-break: break-word;
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px;
+    font-size: 12.5px; line-height: 1.75; max-height: 380px; overflow: auto; color: var(--text);
+}
+.admin-report.show { display: block; }
+
 </style>
 </head>
 <body class="mode-home">
@@ -900,7 +909,7 @@ body.mode-home .main-content { margin-left: 0; width: 100%; }
 <div id="loginModal" class="login-overlay">
     <div class="login-card">
         <div class="login-logo" id="login-logo">🏫</div>
-        <h2 id="login-school-name">សាលាសកល១</h2>
+        <h2 id="login-school-name">អនុវិទ្យាល័យសូទិព្វ</h2>
         <p class="login-sub">ប្រព័ន្ធគ្រប់គ្រងសាលារៀន</p>
 
         <div class="login-form">
@@ -945,7 +954,7 @@ body.mode-home .main-content { margin-left: 0; width: 100%; }
 <div class="sidebar">
     <div class="sidebar-brand">
         <div class="brand-icon" id="brand-icon">🏫</div>
-        <h2 id="brand-name">សាលាសកល១</h2>
+        <h2 id="brand-name">អនុវិទ្យាល័យសូទិព្វ</h2>
     </div>
 
     <button class="nav-btn nav-home" onclick="switchTab('tab-home', this)">🏠 ត្រឡប់ទៅទំព័រដើម</button>
@@ -966,7 +975,7 @@ body.mode-home .main-content { margin-left: 0; width: 100%; }
     <button class="nav-btn" data-module="extra" id="btn-nav-conduct-eval" onclick="switchTab('tab-conduct-eval', this)">🌟 វាយតម្លៃឥរិយាបថ/សមត្ថភាព</button>
 
     <div class="sidebar-category admin-only" data-module="admin">Admin</div>
-    <button class="nav-btn admin-only" data-module="admin" id="btn-nav-admin" onclick="switchTab('tab-admin', this)">🏫 ព័ត៌មានសាលា (Logo &amp; ឈ្មោះ)</button>
+    <button class="nav-btn admin-only" data-module="admin" id="btn-nav-admin" onclick="switchTab('tab-admin', this)">🏫 ព័ត៌មានសាលា &amp; ទិន្នន័យ</button>
     <button class="nav-btn admin-only" data-module="admin" id="btn-nav-data-entry" onclick="switchTab('tab-data-entry', this)">📝 បំពេញទិន្នន័យ</button>
 </div>
 
@@ -983,7 +992,7 @@ body.mode-home .main-content { margin-left: 0; width: 100%; }
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
                     </div>
                     <div class="home-logo-text">
-                        <h1 id="home-school-name">សាលាសកល១</h1>
+                        <h1 id="home-school-name">អនុវិទ្យាល័យសូទិព្វ</h1>
                         <p id="home-role-label">ប្រព័ន្ធគ្រប់គ្រងសាលារៀន</p>
                     </div>
                 </div>
@@ -1068,11 +1077,24 @@ body.mode-home .main-content { margin-left: 0; width: 100%; }
                 <div class="admin-mini-hero">
                     <div class="admin-mini-logo" id="admin-mini-logo">🏫</div>
                     <div class="admin-mini-text">
-                        <div class="admin-mini-name" id="admin-mini-name">សាលាសកល១</div>
+                        <div class="admin-mini-name" id="admin-mini-name">អនុវិទ្យាល័យសូទិព្វ</div>
                         <div class="admin-mini-sub">ប្រព័ន្ធគ្រប់គ្រងសាលារៀន</div>
                     </div>
                 </div>
-                <div class="admin-hint admin-hint-block">Logo និងឈ្មោះនេះនឹងបង្ហាញនៅទំព័រដើម, Sidebar និងទំព័រចូលប្រើ (Login)។</div>
+                <div class="admin-hint admin-hint-block">Logo និងឈ្មោះនេះនឹងបង្ហាញនៅទំព័រដើម, Sidebar, ទំព័រចូលប្រើ (Login) និងរបាយការណ៍ឥរិយាបថ។</div>
+            </div>
+
+            <div class="admin-card admin-wide">
+                <div class="admin-card-title">🗄️ ទិន្នន័យ (Database JSON)</div>
+                <div class="admin-hint admin-hint-block admin-hint-top">Export ជា JSON ដើម្បីបម្រុងទុក ឬ Import ឯកសារគម្រូដែលត្រូវគ្នានឹងប្រព័ន្ធ។ ប្រព័ន្ធត្រួតពិនិត្យទម្រង់មុន Import ជានិច្ច។</div>
+                <div class="admin-btn-row">
+                    <button type="button" class="admin-upload-btn" onclick="exportDatabaseJSON()">⬇️ Export (បម្រុងទុក)</button>
+                    <label class="admin-upload-btn" for="admin-import-input">⬆️ Import JSON</label>
+                    <input type="file" id="admin-import-input" class="admin-file-input" accept=".json,application/json" onchange="handleImportFile(this)">
+                    <button type="button" class="admin-ghost-btn neutral" onclick="runDataCheck()">🔎 ពិនិត្យទិន្នន័យ</button>
+                    <button type="button" class="admin-ghost-btn neutral" onclick="runNormalizeTeachers()">🧹 រៀបចំទិន្នន័យគ្រូ</button>
+                </div>
+                <pre class="admin-report" id="admin-report"></pre>
             </div>
         </div>
     </div>
@@ -2169,6 +2191,7 @@ const firebaseConfig = {
                 globalData.timetable = Array.isArray(data.timetable) ? data.timetable : Object.values(data.timetable);
             }
             
+            window.__schemaVersion = data.meta && data.meta.schemaVersion;
             if (data.settings && data.settings.school) {
                 schoolInfo = { name: data.settings.school.name || '', logo: data.settings.school.logo || '' };
                 saveBrandingCache();
@@ -2320,7 +2343,7 @@ const firebaseConfig = {
     // ====================================================================
     // SCHOOL BRANDING (Logo + Name) — stored in Firebase: settings/school
     // ====================================================================
-    const DEFAULT_SCHOOL_NAME = 'សាលាសកល១';
+    const DEFAULT_SCHOOL_NAME = 'អនុវិទ្យាល័យសូទិព្វ';
     let schoolInfo = { name: '', logo: '' };
     let adminLogoDraft = '';
 
@@ -2466,6 +2489,334 @@ const firebaseConfig = {
         const pin = document.getElementById('modalPin');
         if (pin) pin.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
     })();
+
+    // ====================================================================
+    // DATA MODEL (schemaVersion 1) — helpers, cascade, checks, JSON import/export
+    //   students/<id>                  attendance/<មុខវិជ្ជា_ថ្នាក់_YYYY-MM-DD>/<studentId>
+    //   masterTeachers[] subjectTeachers[] homeroom[] timetable[]  (ភ្ជាប់គ្នាដោយ TeacherID)
+    //   conductEval/<studentId>  conductEvalMeta  settings/school  meta/schemaVersion
+    // ====================================================================
+    const SCHEMA_VERSION = 1;
+    const DB_NODES = ['meta', 'settings', 'students', 'attendance', 'masterTeachers', 'subjectTeachers', 'homeroom', 'timetable', 'conductEval', 'conductEvalMeta'];
+    const KH_DAYS = ['ច័ន្ទ', 'អង្គារ', 'ពុធ', 'ព្រហស្បតិ៍', 'សុក្រ', 'សៅរ៍', 'អាទិត្យ'];
+
+    function cleanForFirebase(v) { return JSON.parse(JSON.stringify(v === undefined ? null : v)); }
+    function safeKey(s) { return (s || '').toString().trim().replace(/[.#$\[\]\/]/g, '-'); }
+    function canonName(s) { return (s || '').toString().replace(/\s+/g, ' ').trim(); }
+
+    // ---------- Students ----------
+    function nextStudentId(cls, taken) {
+        const used = new Set((students || []).map(s => String(s.id)));
+        (taken || []).forEach(t => used.add(String(t)));
+        let n = 1;
+        const re = new RegExp('^' + cls + '-(\\d+)$');
+        used.forEach(id => { const m = re.exec(id); if (m) n = Math.max(n, parseInt(m[1], 10) + 1); });
+        while (used.has(cls + '-' + String(n).padStart(2, '0'))) n++;
+        return cls + '-' + String(n).padStart(2, '0');
+    }
+
+    function resolveNewStudentId(custom, cls, name) {
+        let id = safeKey(custom);
+        if (!id) {
+            id = nextStudentId(cls);
+        } else if ((students || []).some(s => String(s.id) === id)) {
+            if (!confirm('ID [' + id + '] មានរួចហើយ — ចង់ជាន់លើទិន្នន័យសិស្សនោះមែនទេ?')) return '';
+        }
+        const dup = (students || []).find(s => getStudentName(s) === name && getStudentClass(s) === cls && String(s.id) !== id);
+        if (dup && !confirm('មានសិស្សឈ្មោះ "' + name + '" ក្នុងថ្នាក់ ' + cls + ' រួចហើយ (ID ' + dup.id + ')។ បន្ថែមម្តងទៀតមែនទេ?')) return '';
+        return id;
+    }
+
+    // ---------- Teachers (linked by TeacherID) ----------
+    function nextTeacherId() {
+        let max = 0;
+        const scan = arr => (arr || []).forEach(t => {
+            const m = String((t && (t.TeacherID || t.id)) || '').match(/^T(\d+)$/);
+            if (m) max = Math.max(max, parseInt(m[1], 10));
+        });
+        scan(globalData.masterTeachers); scan(globalData.teachers);
+        scan(globalData.subjectTeachers); scan(globalData.homeroom); scan(globalData.timetable);
+        return 'T' + String(max + 1).padStart(3, '0');
+    }
+
+    function teacherIdByName(name) {
+        const n = canonName(name);
+        if (!n) return '';
+        const t = getMasterTeachersList().find(x => canonName(x.name) === n);
+        return t ? (t.id || '') : '';
+    }
+
+    function recTeacherName(r, kind) {
+        if (kind === 'timetable') return canonName(r['គ្រូបង្រៀន']);
+        if (kind === 'subject') return canonName(r['ឈ្មោះគ្រូបង្រៀន'] || r['ឈ្មោះ']);
+        return canonName(r['ឈ្មោះ'] || r.name);
+    }
+
+    function recMatchesTeacher(r, kind, id, name) {
+        const rid = String(r.TeacherID || '').trim();
+        if (id && rid) return rid === id;
+        return recTeacherName(r, kind) === canonName(name);
+    }
+
+    function applyTeacherRename(old, nw) {
+        globalData.subjectTeachers = (globalData.subjectTeachers || []).map(r =>
+            recMatchesTeacher(r, 'subject', old.id, old.name)
+                ? { ...r, TeacherID: nw.id, 'ឈ្មោះគ្រូបង្រៀន': nw.name, 'ឈ្មោះ': nw.name, 'លេខទូរសព្ទ': nw.phone, 'Telegram': nw.telegram } : r);
+        globalData.homeroom = (globalData.homeroom || []).map(r =>
+            recMatchesTeacher(r, 'homeroom', old.id, old.name)
+                ? { ...r, TeacherID: nw.id, 'ឈ្មោះ': nw.name, 'លេខទូរសព្ទ': nw.phone, 'Telegram': nw.telegram } : r);
+        globalData.timetable = (globalData.timetable || []).map(r =>
+            recMatchesTeacher(r, 'timetable', old.id, old.name)
+                ? { ...r, TeacherID: nw.id, 'គ្រូបង្រៀន': nw.name } : r);
+    }
+
+    // Write all teacher-related nodes in ONE atomic update (no half-saved state)
+    function saveTeacherRelatedNodes(cb) {
+        if (!db) { if (cb) cb(null); return; }
+        db.ref().update(cleanForFirebase({
+            masterTeachers: globalData.masterTeachers || [],
+            subjectTeachers: globalData.subjectTeachers || [],
+            homeroom: globalData.homeroom || [],
+            timetable: globalData.timetable || [],
+            'meta/schemaVersion': SCHEMA_VERSION
+        }), cb);
+    }
+
+    function showAdminReport(text) {
+        const el = document.getElementById('admin-report');
+        if (!el) return;
+        el.textContent = text;
+        el.classList.add('show');
+    }
+
+    function runNormalizeTeachers() {
+        if (!db) return setAdminStatus('❌ មិនទាន់ភ្ជាប់ទៅ Firebase!', 'err');
+        const sub = (globalData.subjectTeachers || []).map(r => ({ ...r }));
+        const hr = (globalData.homeroom || []).map(r => ({ ...r }));
+        const tt = (globalData.timetable || []).map(r => ({ ...r }));
+        const map = new Map();
+        const add = (name, id, phone, tg) => {
+            const n = canonName(name);
+            if (!n) return;
+            let t = map.get(n);
+            if (!t) { t = { id: '', name: n, phone: '', telegram: '' }; map.set(n, t); }
+            if (id && !t.id) t.id = String(id).trim();
+            if (phone && !t.phone) t.phone = String(phone).trim();
+            if (tg && !t.telegram) t.telegram = String(tg).trim();
+        };
+        (globalData.masterTeachers || []).forEach(raw => { const n = normalizeTeacherRecord(raw); if (n) add(n.name, n.id, n.phone, n.telegram); });
+        sub.forEach(r => add(r['ឈ្មោះគ្រូបង្រៀន'] || r['ឈ្មោះ'], r.TeacherID, r['លេខទូរសព្ទ'], r['Telegram']));
+        hr.forEach(r => add(r['ឈ្មោះ'] || r.name, r.TeacherID, r['លេខទូរសព្ទ'], r['Telegram']));
+        tt.forEach(r => add(r['គ្រូបង្រៀន'], r.TeacherID, '', ''));
+
+        // unique IDs
+        const seen = new Set();
+        let max = 0;
+        map.forEach(t => { const m = /^T(\d+)$/.exec(t.id); if (m) max = Math.max(max, parseInt(m[1], 10)); });
+        let created = 0;
+        map.forEach(t => {
+            if (!t.id || seen.has(t.id)) { max++; t.id = 'T' + String(max).padStart(3, '0'); created++; }
+            seen.add(t.id);
+        });
+
+        const stampRec = (r, name) => { const t = map.get(canonName(name)); if (t) r.TeacherID = t.id; return t; };
+        sub.forEach(r => { const t = stampRec(r, r['ឈ្មោះគ្រូបង្រៀន'] || r['ឈ្មោះ']); if (t) { r['ឈ្មោះគ្រូបង្រៀន'] = t.name; r['ឈ្មោះ'] = t.name; } });
+        hr.forEach(r => { const t = stampRec(r, r['ឈ្មោះ'] || r.name); if (t) r['ឈ្មោះ'] = t.name; });
+        tt.forEach(r => { const t = stampRec(r, r['គ្រូបង្រៀន']); if (t) r['គ្រូបង្រៀន'] = t.name; });
+
+        const master = Array.from(map.values()).sort((a, b) => a.id.localeCompare(b.id)).map(t => ({
+            TeacherID: t.id, TeacherName: t.name, name: t.name, 'ឈ្មោះ': t.name,
+            Phone: t.phone, 'លេខទូរសព្ទ': t.phone, Telegram: t.telegram
+        }));
+
+        if (!confirm('រៀបចំទិន្នន័យគ្រូ៖\n• គ្រូសរុប ' + master.length + ' នាក់ (ដាក់ ID ថ្មី ' + created + ')\n• ភ្ជាប់ TeacherID ទៅកាន់ មុខវិជ្ជា ' + sub.length + ', គ្រូបន្ទុកថ្នាក់ ' + hr.length + ', កាលវិភាគ ' + tt.length +
+                     '\n\nនឹងសរសេរទៅ Firebase។ សូមបម្រុងទុក (Export) មុនសិន។ បន្តមែនទេ?')) return;
+
+        globalData.masterTeachers = master;
+        globalData.subjectTeachers = sub;
+        globalData.homeroom = hr;
+        globalData.timetable = tt;
+        saveTeacherRelatedNodes(err => {
+            if (err) { setAdminStatus('❌ ' + err.message, 'err'); return; }
+            showAdminReport('✅ រៀបចំទិន្នន័យគ្រូរួចរាល់\n• គ្រូ ' + master.length + ' នាក់ (ID ថ្មី ' + created + ')\n• មុខវិជ្ជា ' + sub.length + ' · គ្រូបន្ទុកថ្នាក់ ' + hr.length + ' · កាលវិភាគ ' + tt.length);
+        });
+    }
+
+    function runDataCheck() {
+        const L = [];
+        const sts = students || [];
+        const active = sts.filter(isStudentActive).length;
+        L.push('📊 សង្ខេប');
+        L.push('• schemaVersion៖ ' + (window.__schemaVersion || 'មិនទាន់កំណត់'));
+        L.push('• សិស្ស៖ ' + sts.length + ' (កំពុងរៀន ' + active + ', បោះបង់ ' + (sts.length - active) + ')');
+
+        // teachers
+        const master = (globalData.masterTeachers || []);
+        const masterNames = new Set(master.map(t => { const n = normalizeTeacherRecord(t); return n ? canonName(n.name) : ''; }));
+        const all = getMasterTeachersList();
+        L.push('• គ្រូ៖ ' + all.length + ' (ក្នុងបញ្ជីមេ ' + masterNames.size + ')');
+        L.push('');
+        L.push('👨‍🏫 គ្រូ និងការប្រើប្រាស់');
+        if (!all.length) L.push('  (គ្មាន)');
+        all.forEach(t => {
+            const id = t.id || '';
+            const a = (globalData.subjectTeachers || []).filter(r => recMatchesTeacher(r, 'subject', id, t.name)).length;
+            const b = (globalData.homeroom || []).filter(r => recMatchesTeacher(r, 'homeroom', id, t.name)).length;
+            const c = (globalData.timetable || []).filter(r => recMatchesTeacher(r, 'timetable', id, t.name)).length;
+            const flags = [];
+            if (!id) flags.push('⚠️ គ្មាន ID');
+            if (!masterNames.has(canonName(t.name))) flags.push('⚠️ មិនមានក្នុងបញ្ជីគ្រូមេ');
+            L.push('  [' + (id || '—') + '] ' + t.name + ' — មុខវិជ្ជា ' + a + ' · បន្ទុកថ្នាក់ ' + b + ' · កាលវិភាគ ' + c + (flags.length ? '  ' + flags.join(' ') : ''));
+        });
+        if (all.some(t => !t.id) || all.some(t => !masterNames.has(canonName(t.name)))) {
+            L.push('  👉 ចុច "🧹 រៀបចំទិន្នន័យគ្រូ" ដើម្បីដាក់ ID និងបញ្ចូលគ្រូទាំងអស់ទៅបញ្ជីមេ');
+        }
+
+        // students
+        L.push('');
+        L.push('🎓 សិស្ស');
+        const groups = {};
+        sts.forEach(s => {
+            const k = getStudentName(s) + '|' + getStudentClass(s);
+            (groups[k] = groups[k] || []).push(String(s.id));
+        });
+        const dups = Object.keys(groups).filter(k => groups[k].length > 1);
+        if (!dups.length) L.push('  ✅ គ្មានសិស្សឈ្មោះស្ទួនក្នុងថ្នាក់តែមួយ');
+        dups.slice(0, 15).forEach(k => L.push('  ⚠️ ស្ទួន៖ ' + k.replace('|', ' (ថ្នាក់ ') + ') → ID ' + groups[k].join(', ')));
+        if (dups.length > 15) L.push('  ... និង ' + (dups.length - 15) + ' ក្រុមទៀត');
+        const badClass = sts.filter(s => DEFAULT_CLASSES.indexOf(getStudentClass(s)) < 0);
+        if (badClass.length) L.push('  ⚠️ ថ្នាក់មិនស្គាល់៖ ' + badClass.length + ' នាក់ (ឧ. ' + badClass.slice(0, 3).map(s => s.id + '→"' + getStudentClass(s) + '"').join(', ') + ')');
+
+        // attendance / conduct
+        const ids = new Set(sts.map(s => String(s.id)));
+        const att = attendanceData || {};
+        let orphanAtt = 0;
+        Object.keys(att).forEach(k => Object.keys(att[k] || {}).forEach(sid => { if (!ids.has(String(sid))) orphanAtt++; }));
+        L.push('');
+        L.push('🗓️ វត្តមាន៖ ' + Object.keys(att).length + ' ថ្ងៃ/មុខវិជ្ជា' + (orphanAtt ? ' · ⚠️ ' + orphanAtt + ' ជួរសម្រាប់សិស្សដែលលែងមានក្នុងបញ្ជី' : ' · ✅ ត្រូវគ្នាទាំងអស់'));
+        const ce = (typeof conductEvalData !== 'undefined' && conductEvalData) ? conductEvalData : {};
+        const orphanCe = Object.keys(ce).filter(k => !ids.has(String(k))).length;
+        L.push('🌟 ឥរិយាបថ៖ ' + Object.keys(ce).length + ' សិស្ស' + (orphanCe ? ' · ⚠️ ' + orphanCe + ' មិនមានក្នុងបញ្ជីសិស្ស' : ' · ✅ ត្រូវគ្នាទាំងអស់'));
+        showAdminReport(L.join('\n'));
+    }
+
+    // ---------- JSON export / import ----------
+    function countOf(v) {
+        if (v === null || v === undefined) return 0;
+        if (Array.isArray(v)) return v.length;
+        if (typeof v === 'object') return Object.keys(v).length;
+        return 1;
+    }
+
+    function exportDatabaseJSON() {
+        if (!db) return setAdminStatus('❌ មិនទាន់ភ្ជាប់ទៅ Firebase!', 'err');
+        db.ref().once('value').then(snap => {
+            const data = snap.val() || {};
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'school-database-' + new Date().toISOString().slice(0, 10) + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setAdminStatus('✅ Export រួចរាល់ (' + Object.keys(data).length + ' node)', 'ok');
+        }).catch(e => setAdminStatus('❌ ' + e.message, 'err'));
+    }
+
+    function validateDatabaseJSON(d) {
+        const errors = [], warnings = [];
+        const warn = m => { if (warnings.length < 40) warnings.push(m); };
+        if (!d || typeof d !== 'object' || Array.isArray(d)) return { errors: ['ឯកសារត្រូវតែជា JSON object'], warnings: [] };
+        Object.keys(d).forEach(k => { if (DB_NODES.indexOf(k) < 0) errors.push('Node មិនស្គាល់៖ "' + k + '" (អនុញ្ញាត៖ ' + DB_NODES.join(', ') + ')'); });
+        if (d.meta && Number(d.meta.schemaVersion) > SCHEMA_VERSION) errors.push('schemaVersion ខ្ពស់ជាងកំណែ App នេះ');
+        const listOf = v => Array.isArray(v) ? v.filter(x => x !== null && x !== undefined) : (v && typeof v === 'object' ? Object.values(v) : []);
+
+        if (d.students) {
+            if (typeof d.students !== 'object') errors.push('students ត្រូវតែជា object');
+            else Object.keys(d.students).forEach(k => {
+                const s = d.students[k] || {};
+                if (!getStudentName(s)) warn('students/' + k + ' គ្មានឈ្មោះ');
+                if (DEFAULT_CLASSES.indexOf(getStudentClass(s)) < 0) warn('students/' + k + ' ថ្នាក់មិនស្គាល់ "' + getStudentClass(s) + '"');
+                if (s.id !== undefined && String(s.id) !== k) warn('students/' + k + ' មាន id="' + s.id + '" មិនដូច key');
+                if (s.status && ['active', 'dropped'].indexOf(String(s.status)) < 0) warn('students/' + k + ' status មិនត្រឹមត្រូវ "' + s.status + '"');
+                if (s.gender && ['ប្រុស', 'ស្រី'].indexOf(String(s.gender)) < 0) warn('students/' + k + ' ភេទមិនត្រឹមត្រូវ "' + s.gender + '"');
+            });
+        }
+        if (d.attendance) {
+            Object.keys(d.attendance).forEach(k => {
+                if (!/^.+_[7-9][AB]_\d{4}-\d{2}-\d{2}$/.test(k)) warn('attendance/' + k + ' key មិនតាមទម្រង់ មុខវិជ្ជា_ថ្នាក់_YYYY-MM-DD');
+                const row = d.attendance[k] || {};
+                Object.keys(row).forEach(sid => { if (['P', 'L', 'A'].indexOf(row[sid]) < 0) warn('attendance/' + k + '/' + sid + ' តម្លៃមិនត្រឹមត្រូវ "' + row[sid] + '" (P/L/A)'); });
+            });
+        }
+        ['masterTeachers', 'subjectTeachers', 'homeroom', 'timetable'].forEach(node => {
+            if (d[node] !== undefined && d[node] !== null && typeof d[node] !== 'object') errors.push(node + ' ត្រូវតែជា array');
+        });
+        const tIds = new Set(listOf(d.masterTeachers).map(t => String(t.TeacherID || t.id || '')).filter(Boolean));
+        listOf(d.masterTeachers).forEach((t, i) => { if (!normalizeTeacherRecord(t)) warn('masterTeachers[' + i + '] គ្មានឈ្មោះ'); if (!(t.TeacherID || t.id)) warn('masterTeachers[' + i + '] គ្មាន TeacherID'); });
+        [['subjectTeachers', 'subject'], ['homeroom', 'homeroom'], ['timetable', 'timetable']].forEach(pair => {
+            listOf(d[pair[0]]).forEach((r, i) => {
+                const cls = String(r.Class || r['ថ្នាក់'] || '').trim();
+                if (DEFAULT_CLASSES.indexOf(cls) < 0) warn(pair[0] + '[' + i + '] ថ្នាក់មិនស្គាល់ "' + cls + '"');
+                if (r.TeacherID && d.masterTeachers && !tIds.has(String(r.TeacherID))) warn(pair[0] + '[' + i + '] TeacherID "' + r.TeacherID + '" មិនមានក្នុង masterTeachers');
+                if (pair[1] === 'timetable') {
+                    const day = r['ថ្ងៃ'] || r.Day;
+                    if (KH_DAYS.indexOf(day) < 0) warn('timetable[' + i + '] ថ្ងៃមិនត្រឹមត្រូវ "' + day + '"');
+                    if (!(r['ម៉ោង'] || r.Time) || !r['មុខវិជ្ជា']) warn('timetable[' + i + '] ខ្វះម៉ោង ឬមុខវិជ្ជា');
+                }
+            });
+        });
+        if (d.conductEval) {
+            const dims = CONDUCT.map(c => c.items.length);
+            Object.keys(d.conductEval).forEach(k => {
+                const e = d.conductEval[k] || {};
+                const okC = Array.isArray(e.conduct) && e.conduct.length === dims.length && e.conduct.every((a, i) => Array.isArray(a) && a.length === dims[i]);
+                const okS = Array.isArray(e.skills) && e.skills.length === SKILLS.length;
+                if (!okC || !okS) warn('conductEval/' + k + ' ទំហំ conduct/skills មិនត្រូវនឹងប្រព័ន្ធ (' + dims.join(',') + ' / ' + SKILLS.length + ')');
+            });
+        }
+        if (d.settings && d.settings.school) {
+            const lg = d.settings.school.logo;
+            if (lg && !isValidLogo(lg)) warn('settings/school/logo មិនមែនរូប data:image ត្រឹមត្រូវ');
+        }
+        return { errors: errors, warnings: warnings };
+    }
+
+    function handleImportFile(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            input.value = '';
+            let obj;
+            try { obj = JSON.parse(String(e.target.result).replace(/^\uFEFF/, '')); }
+            catch (err) { showAdminReport('❌ មិនមែនជា JSON ត្រឹមត្រូវ៖ ' + err.message); return; }
+
+            const v = validateDatabaseJSON(obj);
+            const nodes = Object.keys(obj || {}).filter(k => DB_NODES.indexOf(k) >= 0);
+            const L = ['📄 ' + file.name, 'Node ក្នុងឯកសារ៖'];
+            nodes.forEach(k => L.push('  • ' + k + ' — ' + countOf(obj[k])));
+            if (v.errors.length) { L.push('', '❌ កំហុស (មិនអាច Import)៖'); v.errors.forEach(m => L.push('  - ' + m)); }
+            if (v.warnings.length) { L.push('', '⚠️ ការព្រមាន (' + v.warnings.length + ')៖'); v.warnings.forEach(m => L.push('  - ' + m)); }
+            if (!v.errors.length && !v.warnings.length) L.push('', '✅ ទម្រង់ត្រឹមត្រូវទាំងអស់');
+            showAdminReport(L.join('\n'));
+
+            if (v.errors.length || !nodes.length) return;
+            if (!db) return setAdminStatus('❌ មិនទាន់ភ្ជាប់ទៅ Firebase!', 'err');
+            if (!isAdmin) return setAdminStatus('🔒 សម្រាប់តែ Admin ប៉ុណ្ណោះ', 'err');
+            if (!confirm('Import នឹង "ជំនួស" ទិន្នន័យទាំងស្រុងក្នុង node ទាំងនេះ៖\n' + nodes.join(', ') +
+                         '\n\nទិន្នន័យចាស់ក្នុង node ទាំងនោះនឹងបាត់។ តើអ្នកបាន Export បម្រុងទុកហើយឬនៅ? បន្តមែនទេ?')) return;
+
+            const payload = {};
+            nodes.forEach(k => { payload[k] = obj[k]; });
+            if (!payload.meta) payload['meta/schemaVersion'] = SCHEMA_VERSION;
+            db.ref().update(cleanForFirebase(payload), err => {
+                if (err) setAdminStatus('❌ Import បរាជ័យ៖ ' + err.message, 'err');
+                else setAdminStatus('✅ Import ជោគជ័យ (' + nodes.length + ' node)', 'ok');
+            });
+        };
+        reader.readAsText(file);
+    }
 
     function switchTab(tabId, btn) {
         if (tabId === 'tab-data-entry' && window.innerWidth <= 900) {
@@ -2822,11 +3173,8 @@ const firebaseConfig = {
 
         if(!nameInput || !nameInput.value.trim()) return alert('សូមបញ្ចូលឈ្មោះសិស្ស!');
 
-        let studentId = customIdInput ? customIdInput.value.trim() : '';
-        if(!studentId) {
-            const count = students.filter(s => (s.className === selectedClass || s.class === selectedClass)).length + 1;
-            studentId = `${selectedClass}-${count.toString().padStart(2, '0')}`;
-        }
+        const studentId = resolveNewStudentId(customIdInput ? customIdInput.value.trim() : '', selectedClass, nameInput.value.trim());
+        if (!studentId) return;
 
         const newStudent = {
             id: studentId,
@@ -2838,7 +3186,7 @@ const firebaseConfig = {
         };
 
         if(db) {
-            db.ref('students/' + studentId).set(newStudent, function(err) {
+            db.ref('students/' + studentId).update(newStudent, function(err) {
                 if(!err) {
                     nameInput.value = '';
                     if (customIdInput) customIdInput.value = '';
@@ -2907,8 +3255,8 @@ const firebaseConfig = {
                 const cols = line.split(',').map(c => c.replace(/"/g, '').trim());
 
                 if(cols.length >= 2 && cols[1] !== '') {
-                    const studentId = cols[0] || `${selectedClass}-${(count+1).toString().padStart(2, '0')}`;
                     const targetClass = cols[3] || selectedClass;
+                    const studentId = safeKey(cols[0]) || nextStudentId(targetClass, Object.keys(updates).map(k => k.replace('students/', '')));
                     const stdObj = { 
                         id: studentId, 
                         name: cols[1], 
@@ -3537,12 +3885,12 @@ function renderStudents() {
             const subj = (h['មុខវិជ្ជាបង្រៀន'] || '').toString();
             if (hCls === String(cls).toUpperCase() || subj.includes(cls) || subj.includes(`ថ្នាក់ ${cls}`)) {
                 found = true;
-                return { 'ឈ្មោះ': name, 'លេខទូរសព្ទ': phone, 'Telegram': telegram, 'មុខវិជ្ជាបង្រៀន': subject, 'Class': cls, 'ថ្នាក់': cls };
+                return { 'TeacherID': teacherIdByName(name), 'ឈ្មោះ': name, 'លេខទូរសព្ទ': phone, 'Telegram': telegram, 'មុខវិជ្ជាបង្រៀន': subject, 'Class': cls, 'ថ្នាក់': cls };
             }
             return h;
         });
         if (!found) {
-            globalData.homeroom.push({ 'ឈ្មោះ': name, 'លេខទូរសព្ទ': phone, 'Telegram': telegram, 'មុខវិជ្ជាបង្រៀន': subject, 'Class': cls, 'ថ្នាក់': cls });
+            globalData.homeroom.push({ 'TeacherID': teacherIdByName(name), 'ឈ្មោះ': name, 'លេខទូរសព្ទ': phone, 'Telegram': telegram, 'មុខវិជ្ជាបង្រៀន': subject, 'Class': cls, 'ថ្នាក់': cls });
         }
 
         // Save to Firebase if available
@@ -3727,7 +4075,7 @@ function renderStudents() {
 
 
     // បញ្ជីមុខវិជ្ជាស្តង់ដារ (ប្រើពេលគ្មានបញ្ជីពី Google Sheet)
-    const DEFAULT_SUBJECT_NAMES = ['ភាសាខ្មែរ', 'គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'អង់គ្លេស', 'កុំព្យូទ័រ', 'សីលធម៌', 'កីឡា', 'អប់រំសុខភាព','បំណិនជីវិត'];
+    const DEFAULT_SUBJECT_NAMES = ['ភាសាខ្មែរ', 'គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'អង់គ្លេស', 'កុំព្យូទ័រ', 'សីលធម៌', 'កីឡា', 'សិល្បៈ'];
 
     function getSubjectNameList() {
         const seen = new Set();
@@ -3834,7 +4182,8 @@ function renderStudents() {
             const n = normalizeTeacherRecord({
                 name: t['ឈ្មោះគ្រូបង្រៀន'] || t['ឈ្មោះ'],
                 phone: t['លេខទូរសព្ទ'],
-                telegram: t['Telegram']
+                telegram: t['Telegram'],
+                id: t['TeacherID']
             });
             if (n && !map.has(n.name)) map.set(n.name, n);
         });
@@ -3908,31 +4257,43 @@ function renderStudents() {
         const telegram = document.getElementById('edit-teacher-telegram').value.trim();
         if (!name) return alert('សូមបញ្ចូលឈ្មោះគ្រូ!');
 
-        const patch = (arr) => (arr || []).map(t => {
+        const list = getMasterTeachersList();
+        const old = list.find(t => t.name === oldName);
+        if (!old) return alert('រកមិនឃើញគ្រូ');
+        if (name !== oldName && list.some(t => t.name === name)) {
+            return alert('❌ មានគ្រូឈ្មោះ "' + name + '" ក្នុងបញ្ជីរួចហើយ!');
+        }
+
+        const id = old.id || nextTeacherId();
+        const rec = { TeacherID: id, TeacherName: name, name: name, 'ឈ្មោះ': name, Phone: phone, 'លេខទូរសព្ទ': phone, Telegram: telegram };
+
+        // masterTeachers: update (or create, if this teacher only existed in assignment lists)
+        let found = false;
+        const master = (globalData.masterTeachers || []).map(t => {
             const n = normalizeTeacherRecord(t);
-            if (n && n.name === oldName) {
-                return { ...t, TeacherName: name, name: name, 'ឈ្មោះ': name, Phone: phone, 'លេខទូរសព្ទ': phone, Telegram: telegram };
-            }
+            if (n && ((old.id && n.id === old.id) || n.name === oldName)) { found = true; return { ...t, ...rec }; }
             return t;
         });
-        globalData.masterTeachers = patch(globalData.masterTeachers);
-        globalData.teachers = patch(globalData.teachers);
+        if (!found) master.push(rec);
+        globalData.masterTeachers = master;
+        globalData.teachers = (globalData.teachers || []).map(t => {
+            const n = normalizeTeacherRecord(t);
+            return (n && n.name === oldName) ? { ...t, ...rec } : t;
+        });
+
+        // cascade to every list that stores a copy of this teacher
+        applyTeacherRename(old, { id: id, name: name, phone: phone, telegram: telegram });
 
         const done = () => {
             closeEditTeacherModal();
             renderMasterTeachersList();
             populateTeacherNameDropdown();
-            alert('✅ កែគ្រូបានជោគជ័យ!');
+            alert('✅ កែគ្រូបានជោគជ័យ! (ធ្វើបច្ចុប្បន្នភាពគ្រប់កន្លែងដែលមានគ្រូនេះ)');
         };
         if (db) {
-            db.ref('masterTeachers').set(globalData.masterTeachers || [], err => {
+            saveTeacherRelatedNodes(err => {
                 if (err) alert('❌ ' + err.message);
-                else {
-                    if (typeof google !== 'undefined' && google.script && google.script.run) {
-                        google.script.run.withSuccessHandler(done).withFailureHandler(done)
-                            .saveTeacherToSheet({ teacherName: name, phone: phone, telegram: telegram });
-                    } else done();
-                }
+                else done();
             });
         } else done();
     }
@@ -3951,7 +4312,8 @@ function renderStudents() {
             const n = normalizeTeacherRecord(t);
             return n && n.name === name;
         });
-        const rec = { TeacherName: name, name: name, 'ឈ្មោះ': name, Phone: phone, 'លេខទូរសព្ទ': phone, Telegram: telegram };
+        const existingId = idx >= 0 ? ((normalizeTeacherRecord(globalData.masterTeachers[idx]) || {}).id || '') : '';
+        const rec = { TeacherID: existingId || teacherIdByName(name) || nextTeacherId(), TeacherName: name, name: name, 'ឈ្មោះ': name, Phone: phone, 'លេខទូរសព្ទ': phone, Telegram: telegram };
         if (idx >= 0) globalData.masterTeachers[idx] = { ...globalData.masterTeachers[idx], ...rec };
         else globalData.masterTeachers.push(rec);
 
@@ -4002,24 +4364,38 @@ function renderStudents() {
     }
 
     function deleteMasterTeacher(name) {
-        if (!confirm('លុបគ្រូ [' + name + '] ពីបញ្ជី?')) return;
-        globalData.masterTeachers = (globalData.masterTeachers || []).filter(t => {
-            const n = normalizeTeacherRecord(t);
-            return !n || n.name !== name;
-        });
-        globalData.teachers = (globalData.teachers || []).filter(t => {
-            const n = normalizeTeacherRecord(t);
-            return !n || n.name !== name;
-        });
+        const t = getMasterTeachersList().find(x => x.name === name);
+        const id = t ? (t.id || '') : '';
+        const nSub = (globalData.subjectTeachers || []).filter(r => recMatchesTeacher(r, 'subject', id, name)).length;
+        const nHr = (globalData.homeroom || []).filter(r => recMatchesTeacher(r, 'homeroom', id, name)).length;
+        const nTt = (globalData.timetable || []).filter(r => recMatchesTeacher(r, 'timetable', id, name)).length;
+
+        let msg = 'លុបគ្រូ [' + name + '] ពីបញ្ជី?';
+        if (nSub + nHr + nTt > 0) {
+            msg += '\n\nគ្រូនេះកំពុងត្រូវបានប្រើក្នុង៖\n• មុខវិជ្ជាបង្រៀន ' + nSub + '\n• គ្រូបន្ទុកថ្នាក់ ' + nHr + '\n• កាលវិភាគ ' + nTt +
+                   '\n\nការលុបនឹងដកគ្រូនេះចេញពីកន្លែងទាំងនោះផង (ម៉ោងក្នុងកាលវិភាគនៅតែមាន តែគ្មានឈ្មោះគ្រូ)។';
+        }
+        if (!confirm(msg)) return;
+
+        const isThis = x => { const n = normalizeTeacherRecord(x); return n && ((id && n.id === id) || n.name === name); };
+        globalData.masterTeachers = (globalData.masterTeachers || []).filter(x => !isThis(x));
+        globalData.teachers = (globalData.teachers || []).filter(x => !isThis(x));
+        globalData.subjectTeachers = (globalData.subjectTeachers || []).filter(r => !recMatchesTeacher(r, 'subject', id, name));
+        globalData.homeroom = (globalData.homeroom || []).filter(r => !recMatchesTeacher(r, 'homeroom', id, name));
+        globalData.timetable = (globalData.timetable || []).map(r =>
+            recMatchesTeacher(r, 'timetable', id, name) ? { ...r, 'គ្រូបង្រៀន': '', TeacherID: '' } : r);
 
         const done = () => {
             renderMasterTeachersList();
             populateTeacherNameDropdown();
+            renderSubjectTeachers();
             alert('✅ បានលុបរួច');
         };
-
         if (db) {
-            db.ref('masterTeachers').set(globalData.masterTeachers, () => done());
+            saveTeacherRelatedNodes(err => {
+                if (err) alert('❌ ' + err.message);
+                else done();
+            });
         } else {
             done();
         }
@@ -4042,6 +4418,7 @@ function renderStudents() {
         if (!globalData.subjectTeachers) globalData.subjectTeachers = [];
 
         globalData.subjectTeachers.push({
+            'TeacherID': teacherIdByName(name),
             'ឈ្មោះគ្រូបង្រៀន': name,
             'ឈ្មោះ': name,
             'មុខវិជ្ជាបង្រៀន': subject,
@@ -4167,6 +4544,7 @@ function renderStudents() {
 
         globalData.subjectTeachers[stIndex] = {
             ...globalData.subjectTeachers[stIndex],
+            'TeacherID': teacherIdByName(name),
             'ឈ្មោះគ្រូបង្រៀន': name,
             'ឈ្មោះ': name,
             'មុខវិជ្ជាបង្រៀន': subject,
@@ -4283,6 +4661,7 @@ function renderStudents() {
 
         globalData.timetable[index] = {
             ...globalData.timetable[index],
+            'TeacherID': teacherIdByName(teacher),
             'Class': cls,
             'ថ្នាក់': cls,
             'ថ្ងៃ': day,
@@ -4319,6 +4698,7 @@ function renderStudents() {
         if (!globalData.timetable) globalData.timetable = [];
 
         globalData.timetable.push({
+            'TeacherID': teacherIdByName(teacher),
             'Class': cls,
             'ថ្នាក់': cls,
             'ថ្ងៃ': day,
@@ -4431,11 +4811,8 @@ function renderStudents() {
 
         if (!nameInput || !nameInput.value.trim()) return alert('សូមបញ្ចូលឈ្មោះសិស្ស!');
 
-        let studentId = customIdInput ? customIdInput.value.trim() : '';
-        if (!studentId) {
-            const count = students.filter(s => (s.className === selectedClass || s.class === selectedClass)).length + 1;
-            studentId = `${selectedClass}-${count.toString().padStart(2, '0')}`;
-        }
+        const studentId = resolveNewStudentId(customIdInput ? customIdInput.value.trim() : '', selectedClass, nameInput.value.trim());
+        if (!studentId) return;
 
         const newStudent = {
             id: studentId,
@@ -4447,7 +4824,7 @@ function renderStudents() {
         };
 
         if (db) {
-            db.ref('students/' + studentId).set(newStudent, function(err) {
+            db.ref('students/' + studentId).update(newStudent, function(err) {
                 if (!err) {
                     nameInput.value = '';
                     if (customIdInput) customIdInput.value = '';
@@ -4494,8 +4871,8 @@ function renderStudents() {
                     if (index === 0 || !line.trim()) return;
                     const cols = line.split(',').map(c => c.replace(/"/g, '').trim());
                     if (cols.length >= 2 && cols[1] !== '') {
-                        const studentId = cols[0] || `${cls}-${(count+1).toString().padStart(2, '0')}`;
                         const targetClass = cols[3] || cls;
+                        const studentId = safeKey(cols[0]) || nextStudentId(targetClass, Object.keys(updates).map(k => k.replace('students/', '')));
                         updates['students/' + studentId] = {
                             id: studentId,
                             name: cols[1],
@@ -4710,9 +5087,12 @@ function initFirebase(){
 
     conductEvalData = data.conductEval || {};
 
+    const _schoolNm = ((data.settings && data.settings.school && data.settings.school.name) || '').toString().trim();
     if(data.conductEvalMeta){
-      state.meta.school = data.conductEvalMeta.school || state.meta.school;
+      state.meta.school = _schoolNm || data.conductEvalMeta.school || state.meta.school;
       state.meta.year = data.conductEvalMeta.year || state.meta.year;
+    } else if(_schoolNm){
+      state.meta.school = _schoolNm;
     }
 
     populateClassDropdown();
@@ -5209,12 +5589,6 @@ function initConductEval(){
         </div>
     </div>
 </div>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(console.error));
-}
-</script>
 
 </body>
 </html>
